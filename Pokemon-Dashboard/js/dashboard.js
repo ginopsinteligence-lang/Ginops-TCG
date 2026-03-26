@@ -321,18 +321,54 @@ function openResgatarModal() {
     var cu = getCurrentUser();
     getUserById(cu.id, function(user) {
         if(!user) return;
-        var saldo = (user.monthPoints||0)+(user.historicPoints||0);
-        var lv    = getLevel(user.monthPoints||0);
-        document.getElementById('resgatarPtsAtual').textContent   = saldo;
-        document.getElementById('resgatarValorAtual').textContent = '= R$'+(saldo*0.3).toFixed(2).replace('.',',');
-        document.getElementById('resgatarQtd').value = '';
-        document.getElementById('resgatarInfo').textContent = 'Digite a quantidade de pontos para ver o valor';
-        document.getElementById('resgatarBadgePreview').innerHTML =
-            '<div style="display:inline-flex;flex-direction:column;align-items:center;gap:8px;">'+
-            '<svg width="60" height="60" viewBox="0 0 48 56" style="overflow:visible;filter:drop-shadow(0 0 10px '+lv.glow+')">'+lv.svgPath+'</svg>'+
-            '<span style="font-family:Cinzel,serif;font-size:12px;font-weight:700;color:'+lv.color+';">'+lv.name+'</span>'+
-            '</div>';
-        document.getElementById('resgatarModal').style.display='block';
+        // Se não tem Pix cadastrado, abre aviso primeiro
+        if(!user.pixKey || user.pixKey.trim()==='') {
+            var el = document.getElementById('pixKeyInput');
+            if(el) el.value = '';
+            document.getElementById('pixAvisoModal').style.display='block';
+            return;
+        }
+        abrirModalResgate(user);
+    });
+}
+
+function abrirModalResgate(user) {
+    var saldo = (user.monthPoints||0)+(user.historicPoints||0);
+    var lv    = getLevel(user.monthPoints||0);
+    document.getElementById('resgatarPtsAtual').textContent   = saldo;
+    document.getElementById('resgatarValorAtual').textContent = '= R$'+(saldo*0.3).toFixed(2).replace('.',',');
+    document.getElementById('resgatarQtd').value = '';
+    document.getElementById('resgatarInfo').textContent = 'Digite a quantidade de pontos para ver o valor';
+    document.getElementById('resgatarBadgePreview').innerHTML =
+        '<div style="display:inline-flex;flex-direction:column;align-items:center;gap:8px;">'+
+        '<svg width="60" height="60" viewBox="0 0 48 56" style="overflow:visible;filter:drop-shadow(0 0 10px '+lv.glow+')">'+lv.svgPath+'</svg>'+
+        '<span style="font-family:Cinzel,serif;font-size:12px;font-weight:700;color:'+lv.color+';">'+lv.name+'</span>'+
+        '</div>';
+    document.getElementById('resgatarModal').style.display='block';
+}
+
+function salvarPixEResgatar() {
+    var pixKey = document.getElementById('pixKeyInput').value.trim();
+    if(!pixKey) { showToast('⚠️ Digite sua chave Pix!'); return; }
+    var cu = getCurrentUser();
+    getUserById(cu.id, function(user) {
+        if(!user) return;
+        updateUser(cu.id, {pixKey: pixKey}, function() {
+            var updated = Object.assign({}, user, {pixKey: pixKey});
+            setCurrentUser(updated);
+            document.getElementById('pixAvisoModal').style.display='none';
+            abrirModalResgate(updated);
+            showToast('💳 Chave Pix salva!');
+        });
+    });
+}
+
+function pularPixEResgatar() {
+    var cu = getCurrentUser();
+    getUserById(cu.id, function(user) {
+        if(!user) return;
+        document.getElementById('pixAvisoModal').style.display='none';
+        abrirModalResgate(user);
     });
 }
 
@@ -355,20 +391,15 @@ function confirmarResgate() {
         if(qtd<=histPts){ newHistPts=histPts-qtd; newMonthPts=monthPts; }
         else { var resto=qtd-histPts; newHistPts=0; newMonthPts=monthPts-resto; }
 
-        var pixKey = document.getElementById('resgatarPix') ? document.getElementById('resgatarPix').value.trim() : '';
-        var noteText = 'R$'+(qtd*0.3).toFixed(2).replace('.',',')+' resgatados';
-        if(pixKey) noteText += ' | PIX: '+pixKey;
-
         var history=user.resgatarHistory||[];
-        history.push({id:Date.now().toString(),type:'resgate',points:qtd,valor:(qtd*0.3).toFixed(2),note:noteText,pixKey:pixKey,date:new Date().toISOString()});
+        history.push({id:Date.now().toString(),type:'resgate',points:qtd,valor:(qtd*0.3).toFixed(2),note:'R$'+(qtd*0.3).toFixed(2).replace('.',',')+' resgatados',date:new Date().toISOString()});
 
         updateUser(cu.id,{monthPoints:newMonthPts,historicPoints:newHistPts,resgatarHistory:history},function(){
             var updated=Object.assign({},user,{monthPoints:newMonthPts,historicPoints:newHistPts,resgatarHistory:history});
             setCurrentUser(updated);
             closeResgatarModal();
-            var pixEl=document.getElementById('resgatarPix'); if(pixEl) pixEl.value='';
             loadProfile(updated); loadStats(updated); loadHistory(updated);
-            showToast('🎁 Resgate de '+qtd+' pts (R$'+(qtd*0.3).toFixed(2).replace('.',',')+') registrado!'+(pixKey?' | PIX: '+pixKey:''));
+            showToast('🎁 Resgate de '+qtd+' pts (R$'+(qtd*0.3).toFixed(2).replace('.',',')+') registrado!');
         });
     });
 }
