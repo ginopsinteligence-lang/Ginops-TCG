@@ -336,7 +336,7 @@ function viewPlayerCollection(userId) {
             resgates.forEach(function(r){
                 html+='<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:'+(r.pago?'#f0fff4':'#fff8e6')+';border-radius:10px;border:1px solid '+(r.pago?'#a8e6c0':'#fcd34d')+';">'+
                     '<div style="flex:1;"><div style="font-weight:800;font-size:13px;">'+r.points+' pts = R$'+parseFloat(r.valor||0).toFixed(2).replace('.',',')+'</div>'+
-                    '<div style="font-size:11px;color:#888;">'+formatDate(r.date)+(r.pago?' · Pago em '+formatDate(r.dataPago):'')+'</div></div>'+
+                    '<div style="font-size:11px;color:#888;">'+formatDate(r.date)+(r.pago?' · Pago em '+formatDate(r.dataPago):'')+'</div>'+(r.pixKey?'<div style="font-size:12px;color:#3B4CCA;font-weight:800;margin-top:3px;">💳 PIX: '+r.pixKey+'</div>':'')+'</div>'+
                     (r.pago?'<span style="background:#2ecc71;color:white;padding:4px 10px;border-radius:99px;font-size:11px;font-weight:800;">✅ Pago</span>':
                     '<button class="btn-sm blue" onclick="marcarPago(\''+userId+'\',\''+r.id+'\')" style="font-size:11px;">✅ Pago</button>')+
                 '</div>';
