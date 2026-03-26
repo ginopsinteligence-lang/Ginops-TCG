@@ -588,7 +588,8 @@ function openSaquesModal() {
                     resgatId:  r.id,
                     points:    r.points,
                     valor:     parseFloat(r.valor||(r.points*0.3)),
-                    date:      r.date
+                    date:      r.date,
+                    pixKey:    r.pixKey||''
                 });
             });
         });
@@ -614,7 +615,7 @@ function openSaquesModal() {
                     '<div style="flex:1;min-width:160px;">'+
                         '<div style="font-weight:800;font-size:15px;color:#1a1a2e;">'+escapeHtml(p.userName)+'</div>'+
                         '<div style="font-size:13px;color:#888;">📧 '+escapeHtml(p.userEmail)+'</div>'+
-                        '<div style="font-size:12px;color:#aaa;margin-top:2px;">📅 '+formatDate(p.date)+'</div>'+
+                        '<div style="font-size:12px;color:#aaa;margin-top:2px;">📅 '+formatDate(p.date)+'</div>'+(p.pixKey?'<div style="font-size:12px;color:#3B4CCA;font-weight:800;margin-top:3px;">💳 PIX: '+p.pixKey+'</div>':'')+
                     '</div>'+
                     '<div style="text-align:center;">'+
                         '<div style="font-size:20px;font-weight:800;color:#c8960c;">'+p.points+' 🪙</div>'+
