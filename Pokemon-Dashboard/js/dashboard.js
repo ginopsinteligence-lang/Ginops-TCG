@@ -355,15 +355,20 @@ function confirmarResgate() {
         if(qtd<=histPts){ newHistPts=histPts-qtd; newMonthPts=monthPts; }
         else { var resto=qtd-histPts; newHistPts=0; newMonthPts=monthPts-resto; }
 
+        var pixKey = document.getElementById('resgatarPix') ? document.getElementById('resgatarPix').value.trim() : '';
+        var noteText = 'R$'+(qtd*0.3).toFixed(2).replace('.',',')+' resgatados';
+        if(pixKey) noteText += ' | PIX: '+pixKey;
+
         var history=user.resgatarHistory||[];
-        history.push({id:Date.now().toString(),type:'resgate',points:qtd,valor:(qtd*0.3).toFixed(2),note:'R$'+(qtd*0.3).toFixed(2).replace('.',',')+' resgatados',date:new Date().toISOString()});
+        history.push({id:Date.now().toString(),type:'resgate',points:qtd,valor:(qtd*0.3).toFixed(2),note:noteText,pixKey:pixKey,date:new Date().toISOString()});
 
         updateUser(cu.id,{monthPoints:newMonthPts,historicPoints:newHistPts,resgatarHistory:history},function(){
             var updated=Object.assign({},user,{monthPoints:newMonthPts,historicPoints:newHistPts,resgatarHistory:history});
             setCurrentUser(updated);
             closeResgatarModal();
+            var pixEl=document.getElementById('resgatarPix'); if(pixEl) pixEl.value='';
             loadProfile(updated); loadStats(updated); loadHistory(updated);
-            showToast('🎁 Resgate de '+qtd+' pts (R$'+(qtd*0.3).toFixed(2).replace('.',',')+') registrado!');
+            showToast('🎁 Resgate de '+qtd+' pts (R$'+(qtd*0.3).toFixed(2).replace('.',',')+') registrado!'+(pixKey?' | PIX: '+pixKey:''));
         });
     });
 }
