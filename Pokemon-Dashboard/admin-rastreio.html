@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Admin — Rastreio de Envios · Ginops TCG</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;600;700;800;900&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blue:    #3B4CCA;
+            --yellow:  #FFCB05;
+            --red:     #CC0000;
+            --black:   #1a1a2e;
+            --card-bg: rgba(255,255,255,.04);
+            --border:  rgba(255,255,255,.1);
+        }
+        * { box-sizing:border-box; margin:0; padding:0; }
+        body {
+            background: var(--black);
+            background-image:
+                radial-gradient(ellipse at 20% 30%, rgba(59,76,202,.18) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(204,0,0,.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 10%, rgba(255,203,5,.05) 0%, transparent 60%);
+            min-height:100vh; color:#fff;
+            font-family:'Nunito',sans-serif;
+        }
+        /* ── Header ── */
+        .header {
+            background:rgba(59,76,202,.25);
+            backdrop-filter:blur(20px);
+            border-bottom:1px solid rgba(255,203,5,.18);
+            padding:0 24px; height:60px;
+            display:flex; align-items:center; justify-content:space-between;
+            position:sticky; top:0; z-index:100;
+        }
+        .header-title {
+            font-family:'Press Start 2P',monospace;
+            font-size:11px; color:var(--yellow);
+            letter-spacing:2px;
+        }
+        .btn-back {
+            background:rgba(255,255,255,.09); color:#fff;
+            border:1.5px solid rgba(255,255,255,.18); padding:8px 16px;
+            border-radius:10px; font-weight:800; font-size:13px;
+            text-decoration:none; transition:all .25s;
+        }
+        .btn-back:hover { background:rgba(255,255,255,.16); }
+
+        .main { max-width:900px; margin:0 auto; padding:28px 20px 60px; }
+
+        /* ── Títulos ── */
+        .page-title {
+            font-family:'Cinzel',serif; font-size:22px;
+            color:var(--yellow); margin-bottom:6px;
+        }
+        .page-sub { color:rgba(255,255,255,.5); font-size:13px; font-weight:700; margin-bottom:28px; }
+
+        /* ── Login Admin ── */
+        #loginSection {
+            background:var(--card-bg); border:1.5px solid var(--border);
+            border-radius:20px; padding:32px; max-width:420px; margin:60px auto 0;
+        }
+        #loginSection h2 { font-family:'Cinzel',serif; font-size:18px; color:var(--yellow); margin-bottom:20px; text-align:center; }
+        .form-group { display:flex; flex-direction:column; gap:6px; margin-bottom:16px; }
+        .form-group label { font-size:11px; font-weight:800; color:rgba(255,255,255,.55); text-transform:uppercase; letter-spacing:.5px; }
+        .form-group input {
+            background:rgba(255,255,255,.07);
+            border:1.5px solid rgba(255,255,255,.11);
+            border-radius:11px; padding:12px 14px;
+            color:#fff; font-family:'Nunito',sans-serif;
+            font-size:14px; font-weight:700; outline:none; transition:all .25s;
+        }
+        .form-group input:focus {
+            border-color:var(--yellow);
+            background:rgba(255,203,5,.06);
+            box-shadow:0 0 0 3px rgba(255,203,5,.1);
+        }
+        .btn-primary {
+            width:100%; background:linear-gradient(135deg,var(--yellow),#f0a800);
+            color:var(--black); border:none; padding:14px 28px;
+            border-radius:14px; font-family:'Press Start 2P',monospace;
+            font-size:10px; cursor:pointer; transition:all .3s;
+            box-shadow:0 4px 20px rgba(255,203,5,.3);
+        }
+        .btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(255,203,5,.4); }
+
+        /* ── Filtros / busca ── */
+        .toolbar {
+            display:flex; gap:12px; align-items:center;
+            margin-bottom:20px; flex-wrap:wrap;
+        }
+        .search-input {
+            flex:1; min-width:200px;
+            background:var(--card-bg); border:1.5px solid var(--border);
+            border-radius:11px; padding:11px 16px;
+            color:#fff; font-family:'Nunito',sans-serif;
+            font-size:14px; font-weight:700; outline:none; transition:all .25s;
+        }
+        .search-input:focus { border-color:var(--yellow); background:rgba(255,203,5,.04); }
+        .filter-select {
+            background:var(--card-bg); border:1.5px solid var(--border);
+            border-radius:11px; padding:11px 14px;
+            color:#fff; font-family:'Nunito',sans-serif;
+            font-size:13px; font-weight:700; outline:none; cursor:pointer;
+            appearance:none;
+        }
+        .filter-select option { background:#1a1a2e; }
+
+        /* ── Stats ── */
+        .stats-bar {
+            display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap;
+        }
+        .stat-chip {
+            background:var(--card-bg); border:1.5px solid var(--border);
+            border-radius:12px; padding:12px 18px;
+            display:flex; flex-direction:column; gap:2px; flex:1; min-width:120px;
+        }
+        .stat-chip .num { font-size:22px; font-weight:900; color:var(--yellow); }
+        .stat-chip .lbl { font-size:11px; color:rgba(255,255,255,.5); font-weight:700; }
+
+        /* ── Tabela de pedidos ── */
+        .pedidos-lista { display:flex; flex-direction:column; gap:10px; }
+
+        .pedido-card {
+            background:var(--card-bg); border:1.5px solid var(--border);
+            border-radius:16px; padding:18px 20px;
+            transition:all .25s;
+        }
+        .pedido-card:hover { border-color:rgba(255,203,5,.25); }
+
+        .pedido-header {
+            display:flex; justify-content:space-between;
+            align-items:flex-start; gap:12px; margin-bottom:12px; flex-wrap:wrap;
+        }
+        .pedido-id { font-family:'Press Start 2P',monospace; font-size:8px; color:rgba(255,255,255,.4); margin-bottom:4px; }
+        .pedido-nome { font-size:15px; font-weight:900; color:#fff; }
+        .pedido-email { font-size:12px; color:rgba(255,255,255,.5); font-weight:700; }
+
+        .status-badge {
+            padding:5px 12px; border-radius:20px;
+            font-size:10px; font-weight:900; text-transform:uppercase;
+            letter-spacing:.5px; white-space:nowrap;
+        }
+        .status-pago         { background:rgba(52,211,153,.2); color:#34d399; border:1px solid rgba(52,211,153,.35); }
+        .status-enviado      { background:rgba(59,130,246,.2); color:#60a5fa; border:1px solid rgba(59,130,246,.35); }
+        .status-entregue     { background:rgba(255,203,5,.2);  color:var(--yellow); border:1px solid rgba(255,203,5,.35); }
+        .status-pendente     { background:rgba(251,191,36,.15); color:#fbbf24; border:1px solid rgba(251,191,36,.3); }
+        .status-aguardando_pagamento { background:rgba(156,163,175,.15); color:#9ca3af; border:1px solid rgba(156,163,175,.3); }
+        .status-recusado     { background:rgba(204,0,0,.2); color:#f87171; border:1px solid rgba(204,0,0,.35); }
+
+        .pedido-detalhes {
+            display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+            gap:10px; margin-bottom:14px;
+        }
+        .det-item { display:flex; flex-direction:column; gap:2px; }
+        .det-item .det-lbl { font-size:10px; color:rgba(255,255,255,.4); font-weight:800; text-transform:uppercase; letter-spacing:.5px; }
+        .det-item .det-val { font-size:13px; font-weight:800; color:#fff; }
+
+        /* ── Rastreio form ── */
+        .rastreio-section {
+            background:rgba(59,130,246,.08);
+            border:1.5px solid rgba(59,130,246,.25);
+            border-radius:12px; padding:14px 16px;
+            display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;
+        }
+        .rastreio-section.tem-rastreio {
+            background:rgba(52,211,153,.07);
+            border-color:rgba(52,211,153,.28);
+        }
+        .rastreio-input-group { flex:1; min-width:200px; display:flex; flex-direction:column; gap:5px; }
+        .rastreio-input-group label { font-size:10px; font-weight:800; color:rgba(255,255,255,.55); text-transform:uppercase; letter-spacing:.5px; }
+        .rastreio-input {
+            background:rgba(255,255,255,.07); border:1.5px solid rgba(255,255,255,.14);
+            border-radius:10px; padding:10px 13px;
+            color:#fff; font-family:'Nunito',sans-serif;
+            font-size:14px; font-weight:800; outline:none; transition:all .25s;
+            text-transform:uppercase; letter-spacing:1px;
+        }
+        .rastreio-input:focus { border-color:#60a5fa; background:rgba(59,130,246,.08); }
+
+        .status-select {
+            background:rgba(255,255,255,.07); border:1.5px solid rgba(255,255,255,.14);
+            border-radius:10px; padding:10px 13px;
+            color:#fff; font-family:'Nunito',sans-serif;
+            font-size:13px; font-weight:700; outline:none; cursor:pointer;
+            appearance:none;
+        }
+        .status-select option { background:#1a1a2e; }
+
+        .btn-salvar-rastreio {
+            background:linear-gradient(135deg,#3b82f6,#1d4ed8);
+            color:#fff; border:none; padding:11px 20px;
+            border-radius:11px; font-family:'Nunito',sans-serif;
+            font-weight:900; font-size:13px; cursor:pointer;
+            transition:all .25s; white-space:nowrap;
+            box-shadow:0 4px 16px rgba(59,130,246,.3);
+        }
+        .btn-salvar-rastreio:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(59,130,246,.4); }
+        .btn-salvar-rastreio:disabled { opacity:.5; cursor:not-allowed; transform:none; box-shadow:none; }
+
+        .rastreio-atual {
+            display:flex; align-items:center; gap:8px;
+            font-size:13px; font-weight:800;
+        }
+        .rastreio-atual a { color:#60a5fa; text-decoration:none; }
+        .rastreio-atual a:hover { text-decoration:underline; }
+
+        /* ── Empty state ── */
+        .empty-state {
+            text-align:center; padding:60px 20px;
+            color:rgba(255,255,255,.3);
+        }
+        .empty-state .empty-icon { font-size:48px; margin-bottom:14px; }
+        .empty-state p { font-size:14px; font-weight:700; }
+
+        /* ── Loading ── */
+        #overlay {
+            display:none; position:fixed; inset:0;
+            background:rgba(15,15,30,.85); z-index:999;
+            align-items:center; justify-content:center; flex-direction:column; gap:14px;
+        }
+        #overlay.on { display:flex; }
+        .spinner {
+            width:50px; height:50px;
+            border:4px solid rgba(255,255,255,.12);
+            border-top-color:var(--yellow);
+            border-radius:50%; animation:spin .7s linear infinite;
+        }
+        @keyframes spin { to{transform:rotate(360deg)} }
+        #overlay p { font-family:'Press Start 2P',monospace; font-size:8px; color:rgba(255,255,255,.55); }
+
+        /* ── Toast ── */
+        .toast {
+            position:fixed; bottom:24px; right:24px;
+            background:rgba(52,211,153,.2); border:1.5px solid rgba(52,211,153,.5);
+            color:#34d399; padding:12px 20px; border-radius:12px;
+            font-weight:800; font-size:13px; z-index:9999;
+            transform:translateY(100px); opacity:0; transition:all .35s;
+        }
+        .toast.show { transform:translateY(0); opacity:1; }
+        .toast.err { background:rgba(204,0,0,.2); border-color:rgba(204,0,0,.4); color:#f87171; }
+
+        @media(max-width:600px) {
+            .main { padding:20px 14px 50px; }
+            .page-title { font-size:17px; }
+            .rastreio-section { flex-direction:column; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="overlay"><div class="spinner"></div><p>Carregando...</p></div>
+<div class="toast" id="toast"></div>
+
+<!-- Header -->
+<header class="header">
+    <span class="header-title">GINOPS TCG</span>
+    <a href="admin.html" class="btn-back">← Admin</a>
+</header>
+
+<div class="main" id="mainContent">
+
+    <!-- ── LOGIN ── -->
+    <div id="loginSection">
+        <h2>🔐 Acesso Admin</h2>
+        <div class="form-group">
+            <label>E-mail</label>
+            <input type="email" id="adminEmail" placeholder="seu@email.com">
+        </div>
+        <div class="form-group">
+            <label>Senha</label>
+            <input type="password" id="adminSenha" placeholder="••••••••" onkeydown="if(event.key==='Enter')fazerLogin()">
+        </div>
+        <button class="btn-primary" onclick="fazerLogin()">ENTRAR</button>
+    </div>
+
+    <!-- ── DASHBOARD (hidden até login) ── -->
+    <div id="dashSection" style="display:none;">
+        <h1 class="page-title">📦 Gerenciar Envios</h1>
+        <p class="page-sub">Adicione códigos de rastreio e atualize status dos pedidos</p>
+
+        <!-- Stats -->
+        <div class="stats-bar" id="statsBar"></div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <input type="text" class="search-input" id="searchInput" placeholder="🔍 Buscar por nome, e-mail ou código..." oninput="renderPedidos()">
+            <select class="filter-select" id="filterStatus" onchange="renderPedidos()">
+                <option value="">Todos os status</option>
+                <option value="pago">Pago</option>
+                <option value="enviado">Enviado</option>
+                <option value="entregue">Entregue</option>
+                <option value="pendente">Pendente</option>
+                <option value="aguardando_pagamento">Aguardando pagamento</option>
+            </select>
+        </div>
+
+        <!-- Lista de pedidos -->
+        <div class="pedidos-lista" id="pedidosLista"></div>
+    </div>
+
+</div>
+
+<!-- Firebase -->
+<script src="js/firebase.js"></script>
+
+<script>
+// ════════════════════════════════════════════════════
+//  GINOPS TCG — ADMIN DE RASTREIO
+// ════════════════════════════════════════════════════
+
+var db;
+var auth;
+var PEDIDOS_CACHE = []; // cache local dos pedidos
+
+// ── Inicializa Firebase ───────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+    try {
+        db   = firebase.firestore();
+        auth = firebase.auth();
+
+        auth.onAuthStateChanged(function(user) {
+            if (user) {
+                // Verifica se é admin (você pode restringir por e-mail)
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('dashSection').style.display  = 'block';
+                carregarPedidos();
+            } else {
+                document.getElementById('loginSection').style.display = 'block';
+                document.getElementById('dashSection').style.display  = 'none';
+            }
+        });
+    } catch(e) {
+        console.error('Firebase init error:', e);
+    }
+});
+
+// ── Login ─────────────────────────────────────────
+function fazerLogin() {
+    var email = document.getElementById('adminEmail').value.trim();
+    var senha = document.getElementById('adminSenha').value;
+
+    if (!email || !senha) {
+        showToast('Preencha e-mail e senha', true);
+        return;
+    }
+
+    setLoading(true);
+    auth.signInWithEmailAndPassword(email, senha)
+        .then(function() {
+            setLoading(false);
+        })
+        .catch(function(err) {
+            setLoading(false);
+            showToast('Credenciais inválidas', true);
+            console.error(err);
+        });
+}
+
+// ── Carrega todos os pedidos ──────────────────────
+function carregarPedidos() {
+    setLoading(true);
+
+    db.collection('solicitacoesEnvio')
+        .orderBy('criadoEm', 'desc')
+        .onSnapshot(function(snapshot) {
+            PEDIDOS_CACHE = [];
+            snapshot.forEach(function(doc) {
+                PEDIDOS_CACHE.push({ id: doc.id, ...doc.data() });
+            });
+            setLoading(false);
+            atualizarStats();
+            renderPedidos();
+        }, function(err) {
+            setLoading(false);
+            console.error('Erro ao carregar pedidos:', err);
+            showToast('Erro ao carregar pedidos', true);
+        });
+}
+
+// ── Stats ─────────────────────────────────────────
+function atualizarStats() {
+    var stats = {
+        total:    PEDIDOS_CACHE.length,
+        pagos:    PEDIDOS_CACHE.filter(p => p.status === 'pago').length,
+        enviados: PEDIDOS_CACHE.filter(p => p.status === 'enviado').length,
+        semRastreio: PEDIDOS_CACHE.filter(p => p.status === 'pago' && !p.codigoRastreio).length
+    };
+
+    document.getElementById('statsBar').innerHTML =
+        '<div class="stat-chip"><div class="num">'+stats.total+'</div><div class="lbl">Total</div></div>' +
+        '<div class="stat-chip"><div class="num">'+stats.pagos+'</div><div class="lbl">Pagos</div></div>' +
+        '<div class="stat-chip"><div class="num">'+stats.enviados+'</div><div class="lbl">Enviados</div></div>' +
+        '<div class="stat-chip" style="border-color:rgba(251,191,36,.35)"><div class="num" style="color:#fbbf24">'+stats.semRastreio+'</div><div class="lbl">Sem rastreio</div></div>';
+}
+
+// ── Render da lista ───────────────────────────────
+function renderPedidos() {
+    var busca  = (document.getElementById('searchInput').value || '').toLowerCase();
+    var filtro = document.getElementById('filterStatus').value;
+
+    var lista = PEDIDOS_CACHE.filter(function(p) {
+        if (filtro && p.status !== filtro) return false;
+        if (busca) {
+            var txt = [p.userName, p.userEmail, p.codigoRastreio, p.id].join(' ').toLowerCase();
+            if (txt.indexOf(busca) === -1) return false;
+        }
+        return true;
+    });
+
+    var container = document.getElementById('pedidosLista');
+
+    if (lista.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>Nenhum pedido encontrado</p></div>';
+        return;
+    }
+
+    container.innerHTML = lista.map(function(p) {
+        return renderCardPedido(p);
+    }).join('');
+}
+
+// ── Card de um pedido ─────────────────────────────
+function renderCardPedido(p) {
+    var dataStr = p.criadoEm ? new Date(p.criadoEm).toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—';
+    var caixaInfo = p.caixaInfo || {};
+    var endereco  = p.enderecoEntrega || {};
+    var endStr    = endereco.cidade ? endereco.cidade + '/' + (endereco.estado||'') : '—';
+    var status    = p.status || 'aguardando_pagamento';
+
+    var rastreioSection;
+    if (p.codigoRastreio) {
+        rastreioSection = '<div class="rastreio-section tem-rastreio">'+
+            '<div style="flex:1">'+
+            '<div style="font-size:10px;font-weight:800;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">✅ Código de rastreio</div>'+
+            '<div class="rastreio-atual">'+
+            '<span style="font-size:16px;font-weight:900;color:#34d399;letter-spacing:1.5px;">'+p.codigoRastreio+'</span>'+
+            '&nbsp;·&nbsp;<a href="https://rastreamento.correios.com.br/app/index.php?objeto='+p.codigoRastreio+'" target="_blank">🔗 Ver nos Correios</a>'+
+            '</div></div>'+
+            '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">'+
+            '<input type="text" class="rastreio-input" id="inp_'+p.id+'" value="'+p.codigoRastreio+'" style="max-width:220px;" placeholder="XX000000000BR">'+
+            '<select class="status-select" id="sel_'+p.id+'">'+renderStatusOptions(status)+'</select>'+
+            '<button class="btn-salvar-rastreio" onclick="salvarRastreio(\''+p.id+'\')">💾 Atualizar</button>'+
+            '</div></div>';
+    } else {
+        var podeRastrear = (status === 'pago' || status === 'pendente' || status === 'enviado');
+        rastreioSection = '<div class="rastreio-section">'+
+            '<div class="rastreio-input-group">'+
+            '<label>📬 Código de rastreio</label>'+
+            '<input type="text" class="rastreio-input" id="inp_'+p.id+'" placeholder="XX000000000BR" style="text-transform:uppercase;letter-spacing:1px;">'+
+            '</div>'+
+            '<div style="display:flex;flex-direction:column;gap:5px;">'+
+            '<label style="font-size:10px;font-weight:800;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.5px;">Status</label>'+
+            '<select class="status-select" id="sel_'+p.id+'">'+renderStatusOptions(status)+'</select>'+
+            '</div>'+
+            '<button class="btn-salvar-rastreio" onclick="salvarRastreio(\''+p.id+'\')">📨 Salvar & Notificar</button>'+
+            '</div>';
+    }
+
+    return '<div class="pedido-card" id="card_'+p.id+'">'+
+        '<div class="pedido-header">'+
+        '<div>'+
+        '<div class="pedido-id">#'+p.id+'</div>'+
+        '<div class="pedido-nome">'+escHtml(p.userName || 'Cliente')+'</div>'+
+        '<div class="pedido-email">'+escHtml(p.userEmail || '—')+'</div>'+
+        '</div>'+
+        '<span class="status-badge status-'+status+'">'+statusLabel(status)+'</span>'+
+        '</div>'+
+        '<div class="pedido-detalhes">'+
+        '<div class="det-item"><div class="det-lbl">Data</div><div class="det-val">'+dataStr+'</div></div>'+
+        '<div class="det-item"><div class="det-lbl">Embalagem</div><div class="det-val">'+(caixaInfo.nome||'—')+'</div></div>'+
+        '<div class="det-item"><div class="det-lbl">Destino</div><div class="det-val">'+endStr+'</div></div>'+
+        '<div class="det-item"><div class="det-lbl">Valor pago</div><div class="det-val">'+(p.valorPago ? 'R$ '+p.valorPago.toFixed(2) : '—')+'</div></div>'+
+        '</div>'+
+        rastreioSection+
+        '</div>';
+}
+
+// ── Opções de status ──────────────────────────────
+function renderStatusOptions(atual) {
+    var opts = [
+        { v:'aguardando_pagamento', l:'Aguardando pagamento' },
+        { v:'pendente',   l:'Pendente' },
+        { v:'pago',       l:'Pago' },
+        { v:'enviado',    l:'Enviado ✈️' },
+        { v:'entregue',   l:'Entregue ✅' },
+        { v:'recusado',   l:'Recusado' }
+    ];
+    return opts.map(function(o) {
+        return '<option value="'+o.v+'"'+(o.v===atual?' selected':'')+'>'+o.l+'</option>';
+    }).join('');
+}
+
+// ── Salvar rastreio ───────────────────────────────
+function salvarRastreio(pedidoId) {
+    var codigo = (document.getElementById('inp_'+pedidoId).value || '').trim().toUpperCase();
+    var novoStatus = document.getElementById('sel_'+pedidoId).value;
+
+    if (!codigo && novoStatus === 'enviado') {
+        showToast('Insira o código de rastreio para marcar como enviado', true);
+        return;
+    }
+
+    var btn = document.querySelector('#card_'+pedidoId+' .btn-salvar-rastreio');
+    if (btn) { btn.disabled = true; btn.textContent = 'Salvando...'; }
+
+    var update = {
+        status:          novoStatus,
+        atualizadoEm:    new Date().toISOString()
+    };
+
+    if (codigo) {
+        update.codigoRastreio = codigo;
+        update.urlRastreio    = 'https://rastreamento.correios.com.br/app/index.php?objeto=' + codigo;
+    }
+
+    if (novoStatus === 'enviado' && !PEDIDOS_CACHE.find(p=>p.id===pedidoId)?.dataEnvio) {
+        update.dataEnvio = new Date().toISOString();
+    }
+
+    db.collection('solicitacoesEnvio').doc(pedidoId).update(update)
+        .then(function() {
+            showToast('✅ Rastreio salvo com sucesso!');
+        })
+        .catch(function(err) {
+            console.error(err);
+            showToast('Erro ao salvar. Tente novamente.', true);
+            if (btn) { btn.disabled = false; btn.textContent = 'Salvar'; }
+        });
+}
+
+// ── Helpers ───────────────────────────────────────
+function statusLabel(s) {
+    var labels = {
+        aguardando_pagamento: 'Aguardando pagto',
+        pendente:   'Pendente',
+        pago:       'Pago ✅',
+        enviado:    'Enviado ✈️',
+        entregue:   'Entregue 🎉',
+        recusado:   'Recusado ❌'
+    };
+    return labels[s] || s;
+}
+
+function escHtml(str) {
+    return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function setLoading(on) {
+    var ov = document.getElementById('overlay');
+    if (on) ov.classList.add('on');
+    else    ov.classList.remove('on');
+}
+
+function showToast(msg, err) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast' + (err ? ' err' : '');
+    t.classList.add('show');
+    setTimeout(function(){ t.classList.remove('show'); }, 3000);
+}
+</script>
+</body>
+</html>

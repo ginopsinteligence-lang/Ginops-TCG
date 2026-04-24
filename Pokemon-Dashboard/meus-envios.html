@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Meus Envios · Ginops TCG</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;600;700;800;900&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blue:    #3B4CCA;
+            --yellow:  #FFCB05;
+            --red:     #CC0000;
+            --black:   #1a1a2e;
+        }
+        * { box-sizing:border-box; margin:0; padding:0; }
+        body {
+            background: var(--black);
+            background-image:
+                radial-gradient(ellipse at 20% 30%, rgba(59,76,202,.18) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(204,0,0,.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 10%, rgba(255,203,5,.05) 0%, transparent 60%);
+            min-height:100vh; color:#fff;
+            font-family:'Nunito',sans-serif;
+        }
+        /* decorativos */
+        .deco { position:fixed; width:220px; opacity:.04; z-index:0; pointer-events:none; filter:grayscale(20%); }
+        .deco-1 { top:-40px; right:-30px; }
+        .deco-2 { bottom:0; left:-30px; transform:scaleX(-1); }
+
+        /* Header */
+        .header {
+            background:rgba(59,76,202,.25);
+            backdrop-filter:blur(20px);
+            border-bottom:1px solid rgba(255,203,5,.18);
+            padding:0 24px; height:60px;
+            display:flex; align-items:center; justify-content:space-between;
+            position:sticky; top:0; z-index:100;
+        }
+        .header-title {
+            font-family:'Press Start 2P',monospace;
+            font-size:11px; color:var(--yellow); letter-spacing:2px;
+        }
+        .btn-back {
+            background:rgba(255,255,255,.09); color:#fff;
+            border:1.5px solid rgba(255,255,255,.18); padding:8px 16px;
+            border-radius:10px; font-weight:800; font-size:13px;
+            text-decoration:none; transition:all .25s;
+        }
+        .btn-back:hover { background:rgba(255,255,255,.16); }
+
+        .main {
+            max-width:700px; margin:0 auto;
+            padding:28px 20px 60px; position:relative; z-index:1;
+        }
+
+        /* Hero */
+        .hero { margin-bottom:28px; }
+        .hero h1 { font-family:'Cinzel',serif; font-size:24px; color:var(--yellow); margin-bottom:6px; }
+        .hero p  { color:rgba(255,255,255,.5); font-size:13px; font-weight:700; }
+
+        /* Card pedido */
+        .pedido-card {
+            background:rgba(255,255,255,.04);
+            border:1.5px solid rgba(255,255,255,.1);
+            border-radius:20px; padding:22px;
+            margin-bottom:14px; animation:up .4s ease both;
+        }
+        @keyframes up { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
+
+        .card-header {
+            display:flex; justify-content:space-between;
+            align-items:flex-start; gap:12px;
+            margin-bottom:16px; flex-wrap:wrap;
+        }
+        .card-title { font-family:'Cinzel',serif; font-size:15px; color:#fff; margin-bottom:4px; }
+        .card-data  { font-size:12px; color:rgba(255,255,255,.45); font-weight:700; }
+
+        /* Badge status */
+        .status-badge {
+            padding:6px 14px; border-radius:20px;
+            font-size:10px; font-weight:900; text-transform:uppercase;
+            letter-spacing:.5px; white-space:nowrap;
+        }
+        .s-pago         { background:rgba(52,211,153,.2); color:#34d399; border:1px solid rgba(52,211,153,.3); }
+        .s-enviado      { background:rgba(59,130,246,.2); color:#60a5fa; border:1px solid rgba(59,130,246,.3); }
+        .s-entregue     { background:rgba(255,203,5,.2);  color:var(--yellow); border:1px solid rgba(255,203,5,.3); }
+        .s-pendente     { background:rgba(251,191,36,.15); color:#fbbf24; border:1px solid rgba(251,191,36,.25); }
+        .s-aguardando   { background:rgba(156,163,175,.15); color:#9ca3af; border:1px solid rgba(156,163,175,.25); }
+        .s-recusado     { background:rgba(204,0,0,.2); color:#f87171; border:1px solid rgba(204,0,0,.3); }
+
+        /* Detalhes */
+        .info-grid {
+            display:grid; grid-template-columns:1fr 1fr;
+            gap:10px; margin-bottom:16px;
+        }
+        .info-item { display:flex; flex-direction:column; gap:2px; }
+        .info-lbl { font-size:10px; color:rgba(255,255,255,.4); font-weight:800; text-transform:uppercase; letter-spacing:.5px; }
+        .info-val { font-size:13px; font-weight:800; color:#fff; }
+
+        /* Rastreio box */
+        .rastreio-box {
+            background:linear-gradient(135deg,rgba(59,130,246,.12),rgba(59,130,246,.05));
+            border:1.5px solid rgba(59,130,246,.3);
+            border-radius:14px; padding:16px 18px;
+        }
+        .rastreio-box h3 {
+            font-size:12px; font-weight:900; color:#60a5fa;
+            text-transform:uppercase; letter-spacing:.5px; margin-bottom:10px;
+        }
+        .codigo-rastreio {
+            font-family:'Press Start 2P',monospace;
+            font-size:13px; color:#60a5fa;
+            letter-spacing:2px; margin-bottom:14px;
+            word-break:break-all;
+        }
+
+        /* Timeline de status */
+        .timeline { display:flex; flex-direction:column; gap:0; }
+        .tl-item {
+            display:flex; align-items:flex-start; gap:12px;
+            padding-bottom:14px; position:relative;
+        }
+        .tl-item:not(:last-child)::after {
+            content:'';
+            position:absolute; left:14px; top:30px;
+            width:2px; height:calc(100% - 16px);
+            background:rgba(255,255,255,.1);
+        }
+        .tl-item.ativo::after { background:rgba(59,130,246,.4); }
+
+        .tl-dot {
+            width:28px; height:28px; border-radius:50%;
+            background:rgba(255,255,255,.08);
+            border:2px solid rgba(255,255,255,.15);
+            display:flex; align-items:center; justify-content:center;
+            font-size:12px; flex-shrink:0; z-index:1;
+        }
+        .tl-item.ativo  .tl-dot { background:rgba(59,130,246,.3); border-color:#60a5fa; }
+        .tl-item.done   .tl-dot { background:rgba(52,211,153,.25); border-color:#34d399; }
+        .tl-item.entregue .tl-dot { background:rgba(255,203,5,.25); border-color:var(--yellow); }
+
+        .tl-txt h4 { font-size:13px; font-weight:900; color:rgba(255,255,255,.85); margin-bottom:2px; }
+        .tl-txt p  { font-size:11px; color:rgba(255,255,255,.4); font-weight:700; }
+        .tl-item.ativo  .tl-txt h4 { color:#60a5fa; }
+        .tl-item.done   .tl-txt h4 { color:#34d399; }
+        .tl-item.entregue .tl-txt h4 { color:var(--yellow); }
+
+        /* Btn rastreio externo */
+        .btn-rastrear {
+            display:inline-flex; align-items:center; gap:8px;
+            background:rgba(59,130,246,.2); color:#60a5fa;
+            border:1.5px solid rgba(59,130,246,.35);
+            padding:10px 18px; border-radius:11px;
+            font-weight:900; font-size:13px;
+            text-decoration:none; transition:all .25s; margin-top:12px;
+        }
+        .btn-rastrear:hover { background:rgba(59,130,246,.3); transform:translateY(-1px); }
+
+        /* Sem rastreio */
+        .aguardando-box {
+            background:rgba(251,191,36,.07);
+            border:1.5px solid rgba(251,191,36,.2);
+            border-radius:14px; padding:16px 18px;
+            font-size:13px; color:rgba(255,255,255,.65);
+            font-weight:700; line-height:1.6;
+        }
+        .aguardando-box strong { color:#fbbf24; }
+
+        /* Empty */
+        .empty-state {
+            text-align:center; padding:80px 20px;
+            color:rgba(255,255,255,.3);
+        }
+        .empty-state .icon { font-size:54px; margin-bottom:14px; }
+        .empty-state h3 { font-family:'Cinzel',serif; font-size:18px; color:rgba(255,255,255,.4); margin-bottom:8px; }
+        .empty-state p { font-size:14px; font-weight:700; }
+        .btn-enviar {
+            display:inline-flex; align-items:center; gap:8px;
+            background:linear-gradient(135deg,var(--yellow),#f0a800);
+            color:var(--black); border:none; padding:14px 28px;
+            border-radius:14px; font-family:'Press Start 2P',monospace;
+            font-size:10px; cursor:pointer; transition:all .3s;
+            text-decoration:none; margin-top:24px;
+            box-shadow:0 4px 20px rgba(255,203,5,.3);
+        }
+        .btn-enviar:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(255,203,5,.4); }
+
+        /* Loading */
+        #overlay {
+            display:none; position:fixed; inset:0;
+            background:rgba(15,15,30,.85); z-index:999;
+            align-items:center; justify-content:center; flex-direction:column; gap:14px;
+        }
+        #overlay.on { display:flex; }
+        .spinner {
+            width:50px; height:50px;
+            border:4px solid rgba(255,255,255,.12);
+            border-top-color:var(--yellow);
+            border-radius:50%; animation:spin .7s linear infinite;
+        }
+        @keyframes spin { to{transform:rotate(360deg)} }
+        #overlay p { font-family:'Press Start 2P',monospace; font-size:8px; color:rgba(255,255,255,.55); }
+
+        @media(max-width:540px) {
+            .info-grid { grid-template-columns:1fr; }
+            .card-header { flex-direction:column; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="overlay"><div class="spinner"></div><p>Carregando...</p></div>
+
+<img class="deco deco-1" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/149.png" alt="">
+<img class="deco deco-2" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png" alt="">
+
+<header class="header">
+    <span class="header-title">GINOPS TCG</span>
+    <a href="dashboard.html" class="btn-back">← Dashboard</a>
+</header>
+
+<div class="main">
+    <div class="hero">
+        <h1>📦 Meus Envios</h1>
+        <p>Acompanhe seus pedidos e rastreie suas encomendas</p>
+    </div>
+
+    <div id="conteudo">
+        <!-- preenchido via JS -->
+    </div>
+</div>
+
+<!-- Firebase -->
+<script src="js/firebase.js"></script>
+
+<script>
+// ════════════════════════════════════════════════════
+//  GINOPS TCG — MEUS ENVIOS (CLIENTE)
+// ════════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', function() {
+    try {
+        var db   = firebase.firestore();
+        var auth = firebase.auth();
+
+        auth.onAuthStateChanged(function(user) {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            carregarMeusPedidos(db, user.uid);
+        });
+    } catch(e) {
+        console.error('Firebase error:', e);
+    }
+});
+
+function carregarMeusPedidos(db, userId) {
+    setLoading(true);
+
+    db.collection('solicitacoesEnvio')
+        .where('userId', '==', userId)
+        .orderBy('criadoEm', 'desc')
+        .get()
+        .then(function(snapshot) {
+            setLoading(false);
+
+            if (snapshot.empty) {
+                renderVazio();
+                return;
+            }
+
+            var pedidos = [];
+            snapshot.forEach(function(doc) {
+                pedidos.push({ id: doc.id, ...doc.data() });
+            });
+
+            renderPedidos(pedidos);
+        })
+        .catch(function(err) {
+            setLoading(false);
+            console.error('Erro:', err);
+            // Fallback: tenta sem orderBy (caso índice não exista ainda)
+            db.collection('solicitacoesEnvio')
+                .where('userId', '==', userId)
+                .get()
+                .then(function(snap) {
+                    if (snap.empty) { renderVazio(); return; }
+                    var pedidos = [];
+                    snap.forEach(function(doc) { pedidos.push({ id: doc.id, ...doc.data() }); });
+                    pedidos.sort(function(a,b){ return (b.criadoEm||'').localeCompare(a.criadoEm||''); });
+                    renderPedidos(pedidos);
+                })
+                .catch(function(){ renderVazio(); });
+        });
+}
+
+function renderPedidos(pedidos) {
+    var html = pedidos.map(function(p, i) {
+        return renderCardPedido(p, i);
+    }).join('');
+
+    document.getElementById('conteudo').innerHTML = html;
+}
+
+function renderCardPedido(p, idx) {
+    var status   = p.status || 'aguardando_pagamento';
+    var caixa    = p.caixaInfo || {};
+    var endereco = p.enderecoEntrega || {};
+    var dataStr  = p.criadoEm ? new Date(p.criadoEm).toLocaleDateString('pt-BR') : '—';
+    var endStr   = endereco.cidade ? endereco.cidade + '/' + (endereco.estado||'') : '—';
+    var delay    = (idx * 0.08).toFixed(2);
+
+    var rastreioHtml;
+    if (p.codigoRastreio) {
+        rastreioHtml = '<div class="rastreio-box">'+
+            '<h3>🚚 Rastreamento</h3>'+
+            '<div class="codigo-rastreio">'+p.codigoRastreio+'</div>'+
+            renderTimeline(status)+
+            '<a class="btn-rastrear" href="https://rastreamento.correios.com.br/app/index.php?objeto='+p.codigoRastreio+'" target="_blank">'+
+            '🔍 Rastrear nos Correios</a>'+
+            '</div>';
+    } else if (status === 'pago' || status === 'pendente') {
+        rastreioHtml = '<div class="aguardando-box">'+
+            '⏳ <strong>Pedido confirmado!</strong> Sua encomenda está sendo preparada. '+
+            'O código de rastreio aparecerá aqui assim que seu pedido for enviado.'+
+            '</div>';
+    } else if (status === 'aguardando_pagamento') {
+        rastreioHtml = '<div class="aguardando-box">'+
+            '💳 Aguardando confirmação do pagamento...'+
+            '</div>';
+    } else {
+        rastreioHtml = '';
+    }
+
+    return '<div class="pedido-card" style="animation-delay:'+delay+'s">'+
+        '<div class="card-header">'+
+        '<div>'+
+        '<div class="card-title">'+escHtml(caixa.nome || 'Envio de cartas')+'</div>'+
+        '<div class="card-data">Pedido em '+dataStr+' · '+escHtml(endStr)+'</div>'+
+        '</div>'+
+        '<span class="status-badge '+statusClass(status)+'">'+statusLabel(status)+'</span>'+
+        '</div>'+
+        '<div class="info-grid">'+
+        '<div class="info-item"><div class="info-lbl">Embalagem</div><div class="info-val">'+(caixa.icon||'📦')+' '+(caixa.nome||'—')+'</div></div>'+
+        '<div class="info-item"><div class="info-lbl">Destino</div><div class="info-val">📍 '+escHtml(endStr)+'</div></div>'+
+        (p.valorPago ? '<div class="info-item"><div class="info-lbl">Valor pago</div><div class="info-val">R$ '+p.valorPago.toFixed(2)+'</div></div>' : '')+
+        (p.dataEnvio ? '<div class="info-item"><div class="info-lbl">Data envio</div><div class="info-val">'+new Date(p.dataEnvio).toLocaleDateString('pt-BR')+'</div></div>' : '')+
+        '</div>'+
+        rastreioHtml+
+        '</div>';
+}
+
+// ── Timeline visual ───────────────────────────────
+function renderTimeline(status) {
+    var steps = [
+        { id:'pago',     icon:'✅', label:'Pedido pago',     desc:'Pagamento confirmado' },
+        { id:'enviado',  icon:'✈️', label:'Em trânsito',    desc:'Saiu para entrega' },
+        { id:'entregue', icon:'🎉', label:'Entregue!',       desc:'Nas suas mãos' }
+    ];
+
+    var order = { pago:1, enviado:2, entregue:3 };
+    var current = order[status] || 0;
+
+    var html = '<div class="timeline">';
+    steps.forEach(function(s, i) {
+        var pos = i + 1;
+        var cls = '';
+        if (pos < current)      cls = 'done';
+        else if (pos === current) cls = status === 'entregue' ? 'entregue' : 'ativo';
+
+        html += '<div class="tl-item '+cls+'">'+
+            '<div class="tl-dot">'+s.icon+'</div>'+
+            '<div class="tl-txt">'+
+            '<h4>'+s.label+'</h4>'+
+            '<p>'+s.desc+'</p>'+
+            '</div></div>';
+    });
+    html += '</div>';
+    return html;
+}
+
+function renderVazio() {
+    document.getElementById('conteudo').innerHTML =
+        '<div class="empty-state">'+
+        '<div class="icon">📮</div>'+
+        '<h3>Nenhum envio ainda</h3>'+
+        '<p>Você ainda não solicitou nenhum envio</p>'+
+        '<a href="envio.html" class="btn-enviar">📦 SOLICITAR ENVIO</a>'+
+        '</div>';
+}
+
+// ── Helpers ───────────────────────────────────────
+function statusClass(s) {
+    var map = {
+        pago:'s-pago', enviado:'s-enviado', entregue:'s-entregue',
+        pendente:'s-pendente', aguardando_pagamento:'s-aguardando', recusado:'s-recusado'
+    };
+    return map[s] || 's-aguardando';
+}
+
+function statusLabel(s) {
+    var labels = {
+        aguardando_pagamento: '⏳ Aguardando pagto',
+        pendente:   '⌛ Pendente',
+        pago:       '✅ Pago',
+        enviado:    '✈️ Enviado',
+        entregue:   '🎉 Entregue',
+        recusado:   '❌ Recusado'
+    };
+    return labels[s] || s;
+}
+
+function escHtml(str) {
+    return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function setLoading(on) {
+    var ov = document.getElementById('overlay');
+    if (on) ov.classList.add('on');
+    else    ov.classList.remove('on');
+}
+</script>
+</body>
+</html>
