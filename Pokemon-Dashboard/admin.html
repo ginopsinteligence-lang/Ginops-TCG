@@ -461,7 +461,8 @@
                                     '</select>' +
                                 '</div>' +
                             '</div>' +
-                            '<div style="text-align:right;padding-top:10px;border-top:1px solid #e8eaff;margin-top:10px;">' +
+                            '<div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid #e8eaff;margin-top:10px;flex-wrap:wrap;gap:8px;">' +
+                                '<button onclick="event.stopPropagation();gerarEtiqueta(\''+env.id+'\')" id="btnEtiqueta_'+env.id+'" style="padding:8px 18px;background:linear-gradient(135deg,#27ae60,#2ecc71);color:white;border:none;border-radius:8px;font-family:\'Nunito\',sans-serif;font-weight:800;font-size:12px;cursor:pointer;">🏷️ Gerar Etiqueta</button>' +
                                 '<button onclick="event.stopPropagation();excluirEnvio(\''+env.id+'\')" style="padding:8px 16px;background:#fff0f0;color:#e74c3c;border:2px solid #e74c3c33;border-radius:8px;font-family:\'Nunito\',sans-serif;font-weight:800;font-size:12px;cursor:pointer;">🗑️ Excluir pedido</button>' +
                             '</div>' +
                         '</td>' +
@@ -482,7 +483,78 @@
             if (row) row.classList.toggle('open');
         }
 
-                function excluirEnvio(id) {
+                function gerarEtiqueta(id) {
+            var env = _todosEnvios.find(function(e) { return e.id === id; });
+            if (!env) return;
+
+            if (!env.freteId) {
+                // Se não tem freteId salvo, pede confirmação e usa valor padrão
+                if (!confirm('Este pedido não tem serviço de frete salvo. Deseja gerar etiqueta com o serviço padrão (PAC)?')) return;
+            }
+
+            var btn = document.getElementById('btnEtiqueta_'+id);
+            if (btn) { btn.textContent = '⏳ Gerando...'; btn.disabled = true; }
+
+            var end = env.enderecoEntrega || {};
+
+            fetch('/api/gerar-etiqueta', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    pedidoId:         id,
+                    freteId:          env.freteId || 1,
+                    nomeDestinatario: env.userName || '',
+                    cpfDestinatario:  end.cpf || '',
+                    cepDestino:       end.cep || '',
+                    enderecoDestino:  end,
+                    caixaTipo:        env.caixaTipo || 'pequena',
+                    itensDeclarados:  env.itensDeclarados || [],
+                    valorPago:        env.valorPago || 10
+                })
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (btn) { btn.textContent = '🏷️ Gerar Etiqueta'; btn.disabled = false; }
+
+                if (data.error) {
+                    showNotification('❌ ' + data.error, 'error');
+                    return;
+                }
+
+                // Salva rastreio automaticamente se veio
+                if (data.rastreio) {
+                    db.collection('solicitacoesEnvio').doc(id).update({
+                        codigoRastreio: data.rastreio,
+                        status: 'Em trânsito',
+                        meItemId: data.itemId
+                    });
+                    var inp = document.getElementById('rastreio_'+id);
+                    if (inp) inp.value = data.rastreio;
+                    for (var i = 0; i < _todosEnvios.length; i++) {
+                        if (_todosEnvios[i].id === id) {
+                            _todosEnvios[i].codigoRastreio = data.rastreio;
+                            _todosEnvios[i].status = 'Em trânsito';
+                            break;
+                        }
+                    }
+                    filtrarEnvios();
+                }
+
+                // Abre link de impressão
+                if (data.linkImpressao) {
+                    window.open(data.linkImpressao, '_blank');
+                    showNotification('✅ Etiqueta gerada! Abrindo impressão...', 'success');
+                } else {
+                    showNotification('✅ Etiqueta gerada! Acesse o Melhor Envio para imprimir.', 'success');
+                }
+            })
+            .catch(function() {
+                if (btn) { btn.textContent = '🏷️ Gerar Etiqueta'; btn.disabled = false; }
+                showNotification('❌ Erro ao gerar etiqueta. Verifique seu saldo no Melhor Envio.', 'error');
+            });
+        }
+
+        function excluirEnvio(id) {
             if (!confirm('Tem certeza que deseja excluir este pedido? Esta ação não pode ser desfeita.')) return;
             db.collection('solicitacoesEnvio').doc(id).delete().then(function() {
                 _todosEnvios = _todosEnvios.filter(function(e) { return e.id !== id; });
