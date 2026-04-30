@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ginops TCG — Leilões</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
+
+:root {
+    --bg:        #0f1117;
+    --bg2:       #1a1d27;
+    --bg3:       #22263a;
+    --border:    #2e3250;
+    --accent:    #6c63ff;
+    --accent2:   #ff6584;
+    --green:     #2ecc71;
+    --yellow:    #f1c40f;
+    --red:       #e74c3c;
+    --text:      #e8eaf6;
+    --text2:     #9ea3c0;
+    --radius:    14px;
+    --shadow:    0 4px 24px rgba(0,0,0,0.4);
+}
+
+body { font-family:'Nunito',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+/* TOPO */
+.topbar {
+    background:var(--bg2);
+    border-bottom:1px solid var(--border);
+    padding:0 24px;
+    height:60px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    position:sticky; top:0; z-index:100;
+}
+.topbar-brand { display:flex; align-items:center; gap:10px; font-weight:900; font-size:18px; }
+.topbar-brand span { color:var(--accent); }
+.topbar-actions { display:flex; gap:10px; }
+
+/* LAYOUT */
+.container { max-width:1200px; margin:0 auto; padding:24px; }
+
+/* BOTÕES */
+.btn { display:inline-flex; align-items:center; gap:6px; padding:10px 18px; border:none; border-radius:10px; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; transition:all .2s; }
+.btn-primary  { background:var(--accent); color:white; }
+.btn-primary:hover  { background:#5a52e0; }
+.btn-success  { background:var(--green); color:white; }
+.btn-success:hover  { background:#27ae60; }
+.btn-danger   { background:var(--red); color:white; }
+.btn-danger:hover   { background:#c0392b; }
+.btn-ghost    { background:transparent; color:var(--text2); border:1px solid var(--border); }
+.btn-ghost:hover    { background:var(--bg3); color:var(--text); }
+.btn-yellow   { background:var(--yellow); color:#1a1a2e; }
+.btn-yellow:hover   { background:#d4ac0d; }
+.btn-sm { padding:6px 12px; font-size:12px; border-radius:8px; }
+
+/* CARDS */
+.card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:20px; }
+
+/* LISTA DE LEILÕES */
+.list-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:12px; }
+.list-header h1 { font-size:22px; font-weight:900; }
+.list-filters { display:flex; gap:10px; flex-wrap:wrap; }
+.list-filters input, .list-filters select {
+    padding:9px 14px; background:var(--bg2); border:1px solid var(--border);
+    border-radius:10px; color:var(--text); font-family:inherit; font-size:13px;
+}
+.list-filters input:focus, .list-filters select:focus { outline:none; border-color:var(--accent); }
+
+.leilao-card {
+    background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius);
+    padding:18px 20px; margin-bottom:12px; cursor:pointer;
+    transition:all .2s;
+}
+.leilao-card:hover { border-color:var(--accent); transform:translateY(-2px); box-shadow:var(--shadow); }
+.leilao-card-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; }
+.leilao-nome { font-size:16px; font-weight:800; margin-bottom:4px; }
+.leilao-data { font-size:12px; color:var(--text2); }
+.leilao-stats { display:flex; gap:20px; flex-wrap:wrap; }
+.stat-item { text-align:center; }
+.stat-num { display:block; font-size:16px; font-weight:800; color:var(--accent); }
+.stat-label { font-size:11px; color:var(--text2); }
+.stat-pendente .stat-num { color:var(--yellow); }
+
+/* BADGES */
+.badge { padding:4px 12px; border-radius:99px; font-size:11px; font-weight:800; }
+.badge-ativo      { background:rgba(231,76,60,.2); color:#e74c3c; border:1px solid #e74c3c; }
+.badge-finalizado { background:rgba(46,204,113,.2); color:#2ecc71; border:1px solid #2ecc71; }
+.badge-rascunho   { background:rgba(156,163,175,.15); color:#9ea3c0; border:1px solid var(--border); }
+.badge-player     { background:rgba(108,99,255,.2); color:var(--accent); border:1px solid var(--accent); padding:2px 8px; border-radius:99px; font-size:10px; }
+.badge-externo    { background:rgba(241,196,15,.15); color:var(--yellow); border:1px solid var(--yellow); padding:2px 8px; border-radius:99px; font-size:10px; }
+
+/* DETALHE DO LEILÃO */
+#detailView { display:none; }
+.detail-header {
+    background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius);
+    padding:20px 24px; margin-bottom:20px;
+    display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;
+}
+.detail-title { font-size:22px; font-weight:900; margin-bottom:4px; }
+.detail-meta  { font-size:13px; color:var(--text2); display:flex; gap:16px; flex-wrap:wrap; margin-top:6px; }
+.detail-actions { display:flex; gap:8px; flex-wrap:wrap; }
+
+/* TABS */
+.tabs { display:flex; gap:4px; margin-bottom:20px; background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:4px; width:fit-content; }
+.tab-btn { padding:8px 20px; border:none; border-radius:9px; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; background:transparent; color:var(--text2); transition:all .2s; }
+.tab-btn.active { background:var(--accent); color:white; }
+
+.tab-content { display:none; }
+.tab-content.active { display:block; }
+
+/* ADICIONAR CARTA */
+#addCardPanel {
+    background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius);
+    padding:20px; margin-bottom:20px; display:none;
+}
+.search-mode-btns { display:flex; gap:8px; margin-bottom:14px; }
+.mode-btn { padding:8px 16px; border:2px solid var(--border); border-radius:8px; background:transparent; color:var(--text2); font-family:inherit; font-size:12px; font-weight:700; cursor:pointer; transition:all .2s; }
+.mode-btn.active { border-color:var(--accent); color:var(--accent); background:rgba(108,99,255,.1); }
+
+.search-row { display:flex; gap:10px; margin-bottom:14px; }
+.search-row input { flex:1; padding:10px 14px; background:var(--bg2); border:1px solid var(--border); border-radius:10px; color:var(--text); font-family:inherit; font-size:13px; }
+.search-row input:focus { outline:none; border-color:var(--accent); }
+
+.card-results-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:10px; max-height:320px; overflow-y:auto; margin-bottom:14px; }
+.search-result-card { background:var(--bg2); border:2px solid var(--border); border-radius:10px; padding:10px; cursor:pointer; text-align:center; transition:all .2s; }
+.search-result-card:hover { border-color:var(--accent); }
+.search-result-card.selected { border-color:var(--accent); background:rgba(108,99,255,.15); }
+.search-result-card img { width:100%; border-radius:6px; margin-bottom:6px; }
+.src-name { font-size:11px; font-weight:700; margin-bottom:2px; }
+.src-info { font-size:10px; color:var(--text2); margin-bottom:2px; }
+.src-rarity { font-size:10px; color:var(--accent); }
+
+#addItemSection { background:var(--bg2); border:1px solid var(--accent); border-radius:10px; padding:14px; display:none; }
+#addItemSection label { font-size:12px; color:var(--text2); display:block; margin-bottom:4px; }
+#addItemSection .valor-row { display:flex; align-items:center; gap:10px; }
+#addItemSection input { flex:1; padding:10px 14px; background:var(--bg3); border:1px solid var(--border); border-radius:8px; color:var(--text); font-family:inherit; font-size:14px; }
+
+/* GRID DE ITENS */
+.itens-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
+.itens-header h3 { font-size:14px; font-weight:800; }
+#totalItens { font-size:13px; color:var(--text2); }
+
+.items-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; }
+.item-card { background:var(--bg3); border:1px solid var(--border); border-radius:12px; padding:12px; text-align:center; }
+.item-card img { width:100%; border-radius:8px; margin-bottom:8px; }
+.item-name { font-size:12px; font-weight:700; margin-bottom:2px; }
+.item-set  { font-size:10px; color:var(--text2); margin-bottom:4px; }
+.item-valor { font-size:14px; font-weight:800; color:var(--green); margin-bottom:4px; }
+.item-arrematante { font-size:11px; color:var(--accent); margin-bottom:6px; }
+.item-arrematante.sem { color:var(--text2); font-style:italic; }
+.item-actions { display:flex; gap:6px; justify-content:center; }
+.btn-icon { width:30px; height:30px; border:1px solid var(--border); border-radius:8px; background:var(--bg2); cursor:pointer; font-size:14px; display:flex; align-items:center; justify-content:center; transition:all .2s; }
+.btn-icon:hover { border-color:var(--accent); }
+.btn-icon.danger:hover { border-color:var(--red); }
+
+/* ARREMATANTES */
+.arrematante-card {
+    background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius);
+    margin-bottom:14px; overflow:hidden; transition:border-color .2s;
+}
+.arrematante-card.pago { border-color:rgba(46,204,113,.4); }
+.arr-header { display:flex; align-items:center; gap:14px; padding:16px 18px; border-bottom:1px solid var(--border); flex-wrap:wrap; }
+.arr-avatar { width:44px; height:44px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:900; font-size:18px; flex-shrink:0; }
+.arr-info { flex:1; min-width:0; }
+.arr-nome { font-size:15px; font-weight:800; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.arr-resumo { font-size:12px; color:var(--text2); margin-top:2px; }
+.arr-status { display:flex; gap:8px; flex-wrap:wrap; }
+.status-ok   { background:rgba(46,204,113,.15); color:var(--green); border:1px solid var(--green); padding:4px 10px; border-radius:99px; font-size:11px; font-weight:700; }
+.status-pend { background:rgba(241,196,15,.15); color:var(--yellow); border:1px solid var(--yellow); padding:4px 10px; border-radius:99px; font-size:11px; font-weight:700; }
+
+.arr-itens { padding:12px 18px; display:flex; flex-direction:column; gap:8px; }
+.arr-item { display:flex; align-items:center; gap:12px; padding:8px; background:var(--bg2); border-radius:10px; }
+.arr-item-img { width:48px; border-radius:6px; flex-shrink:0; }
+.arr-item-info { flex:1; min-width:0; }
+.arr-item-name { font-size:12px; font-weight:700; }
+.arr-item-val  { font-size:13px; color:var(--green); font-weight:800; }
+.arr-item-checks { display:flex; flex-direction:column; gap:4px; }
+.check-label { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text2); cursor:pointer; white-space:nowrap; }
+.check-label input[type=checkbox] { accent-color:var(--accent); width:14px; height:14px; cursor:pointer; }
+
+.btn-integrar {
+    display:block; width:calc(100% - 36px); margin:0 18px 14px;
+    padding:10px; background:linear-gradient(135deg,var(--accent),#9c63ff);
+    color:white; border:none; border-radius:10px; font-family:inherit;
+    font-size:13px; font-weight:800; cursor:pointer; transition:all .2s;
+}
+.btn-integrar:hover { opacity:.9; transform:translateY(-1px); }
+
+/* MODAIS */
+.modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:200; align-items:center; justify-content:center; }
+.modal[style*="block"] { display:flex !important; }
+.modal-box { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:28px; width:90%; max-width:500px; max-height:90vh; overflow-y:auto; position:relative; }
+.modal-box h2 { font-size:18px; font-weight:900; margin-bottom:20px; }
+.modal-close { position:absolute; top:16px; right:16px; background:transparent; border:none; color:var(--text2); font-size:20px; cursor:pointer; }
+.modal-close:hover { color:var(--text); }
+
+.form-group { margin-bottom:14px; }
+.form-group label { display:block; font-size:12px; color:var(--text2); margin-bottom:6px; font-weight:700; }
+.form-group input, .form-group textarea, .form-group select {
+    width:100%; padding:10px 14px; background:var(--bg3); border:1px solid var(--border);
+    border-radius:10px; color:var(--text); font-family:inherit; font-size:13px;
+}
+.form-group input:focus, .form-group textarea:focus { outline:none; border-color:var(--accent); }
+.form-group textarea { resize:vertical; min-height:70px; }
+
+.modal-footer { display:flex; gap:10px; justify-content:flex-end; margin-top:20px; }
+
+/* BUSCA DE PLAYER */
+.divider { display:flex; align-items:center; gap:10px; margin:14px 0; }
+.divider span { font-size:11px; color:var(--text2); white-space:nowrap; }
+.divider::before, .divider::after { content:''; flex:1; height:1px; background:var(--border); }
+
+.user-result { display:flex; align-items:center; gap:10px; padding:10px; border-radius:10px; cursor:pointer; transition:background .2s; }
+.user-result:hover { background:var(--bg3); }
+.user-avatar { width:36px; height:36px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:900; font-size:14px; flex-shrink:0; }
+.user-name  { font-size:13px; font-weight:700; }
+.user-email { font-size:11px; color:var(--text2); }
+#arrSelectedInfo { display:none; align-items:center; gap:10px; padding:10px; background:rgba(108,99,255,.1); border:1px solid var(--accent); border-radius:10px; margin-top:8px; }
+#arrSelectedInfo .user-avatar { background:var(--accent); }
+
+/* ESTADOS */
+.loading-state, .empty-state-main { text-align:center; padding:40px; color:var(--text2); }
+.empty-state-main .empty-icon { font-size:40px; margin-bottom:10px; }
+
+/* NOTIFICAÇÃO */
+.notification { position:fixed; bottom:24px; right:24px; padding:14px 20px; border-radius:12px; font-weight:700; font-size:13px; z-index:999; opacity:0; transform:translateY(10px); transition:all .3s; pointer-events:none; }
+.notification.show { opacity:1; transform:translateY(0); }
+.notification.success { background:#2ecc71; color:white; }
+.notification.error   { background:#e74c3c; color:white; }
+
+@media(max-width:600px){
+    .container { padding:14px; }
+    .detail-header { flex-direction:column; }
+    .arr-header { flex-direction:column; align-items:flex-start; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="topbar-brand">🏷️ Ginops TCG — <span>Leilões</span></div>
+    <div class="topbar-actions">
+        <a href="admin.html" class="btn btn-ghost btn-sm">← Admin</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- LISTA DE LEILÕES -->
+    <div id="listView">
+        <div class="list-header">
+            <h1>🏷️ Leilões</h1>
+            <div class="list-filters">
+                <input type="text" id="searchLeilao" placeholder="🔍 Buscar leilão..." oninput="renderLeiloesList()">
+                <select id="filterStatus" onchange="renderLeiloesList()">
+                    <option value="todos">Todos</option>
+                    <option value="rascunho">Rascunho</option>
+                    <option value="ativo">Ativo</option>
+                    <option value="finalizado">Finalizado</option>
+                </select>
+                <button class="btn btn-primary" onclick="openCreateLeilao()">+ Novo Leilão</button>
+            </div>
+        </div>
+        <div id="leiloesList"></div>
+    </div>
+
+    <!-- DETALHE DO LEILÃO -->
+    <div id="detailView">
+        <div class="detail-header">
+            <div>
+                <button class="btn btn-ghost btn-sm" onclick="backToList()" style="margin-bottom:10px;">← Voltar</button>
+                <div class="detail-title" id="detailNome"></div>
+                <div class="detail-meta">
+                    <span id="detailStatus"></span>
+                    <span>📅 <span id="detailData"></span></span>
+                    <span id="detailDesc" style="color:var(--text2);font-style:italic;"></span>
+                </div>
+            </div>
+            <div class="detail-actions">
+                <button id="btnAtivo"      class="btn btn-yellow btn-sm" onclick="setStatus('ativo')">🔴 Marcar Ativo</button>
+                <button id="btnFinalizado" class="btn btn-success btn-sm" onclick="setStatus('finalizado')">✅ Finalizar</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteLeilao()">🗑️ Excluir</button>
+            </div>
+        </div>
+
+        <!-- TABS -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('itens',this)">🎴 Itens</button>
+            <button class="tab-btn" onclick="switchTab('arrematantes',this)">👥 Arrematantes</button>
+        </div>
+
+        <!-- TAB: ITENS -->
+        <div id="tab-itens" class="tab-content active">
+            <div class="itens-header">
+                <div>
+                    <h3>🎴 Cartas do Leilão</h3>
+                    <div id="totalItens" style="margin-top:4px;"></div>
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="toggleAddCard()">+ Adicionar Carta</button>
+            </div>
+
+            <!-- PAINEL ADICIONAR CARTA -->
+            <div id="addCardPanel">
+                <div class="search-mode-btns">
+                    <button class="mode-btn active" id="modeByName" onclick="setSearchModeLeilao('name')">🔤 Por Nome</button>
+                    <button class="mode-btn" id="modeByNumber" onclick="setSearchModeLeilao('number')">🔢 Por Número</button>
+                    <button class="mode-btn" id="modeManual" onclick="setSearchModeLeilao('manual')">✍️ Manual</button>
+                </div>
+
+                <div id="searchByName" style="display:flex;">
+                    <div class="search-row" style="flex:1;margin-bottom:14px;">
+                        <input type="text" id="cardSearchLeilao" placeholder="🔍 Nome do Pokémon (ex: Charizard)">
+                        <button class="btn btn-primary btn-sm" onclick="searchCardsLeilao()">Buscar</button>
+                    </div>
+                </div>
+                <div id="searchByNumber" style="display:none;">
+                    <div class="search-row" style="flex:1;margin-bottom:14px;">
+                        <input type="text" id="numberSearchLeilao" placeholder="🔢 Número (ex: 161/131)">
+                        <button class="btn btn-primary btn-sm" onclick="searchCardsLeilao()">Buscar</button>
+                    </div>
+                </div>
+
+                <!-- MODO MANUAL -->
+                <div id="searchManual" style="display:none;">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+                        <div>
+                            <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px;">Nome da carta *</label>
+                            <input type="text" id="manualNome" placeholder="Ex: Charizard" style="width:100%;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:inherit;font-size:13px;">
+                        </div>
+                        <div>
+                            <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px;">Set / Coleção</label>
+                            <input type="text" id="manualSet" placeholder="Ex: Base Set" style="width:100%;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:inherit;font-size:13px;">
+                        </div>
+                        <div>
+                            <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px;">Número</label>
+                            <input type="text" id="manualNumero" placeholder="Ex: 4/102" style="width:100%;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:inherit;font-size:13px;">
+                        </div>
+                        <div>
+                            <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px;">Raridade</label>
+                            <input type="text" id="manualRaridade" placeholder="Ex: Rare Holo" style="width:100%;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:inherit;font-size:13px;">
+                        </div>
+                        <div style="grid-column:1/-1;">
+                            <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px;">URL da imagem (opcional)</label>
+                            <input type="text" id="manualImagem" placeholder="https://..." style="width:100%;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:inherit;font-size:13px;">
+                        </div>
+                        <div>
+                            <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px;">Valor (R$) *</label>
+                            <input type="number" id="manualValor" placeholder="0,00" min="0" step="0.01" style="width:100%;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:inherit;font-size:13px;">
+                        </div>
+                        <div style="display:flex;align-items:flex-end;">
+                            <button class="btn btn-success" style="width:100%;" onclick="addItemManual()">✅ Adicionar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-results-grid" id="cardResultsLeilao"></div>
+
+                <div id="addItemSection">
+                    <label>Valor da carta (R$)</label>
+                    <div class="valor-row">
+                        <input type="number" id="itemValor" placeholder="0,00" min="0" step="0.01">
+                        <button class="btn btn-success" onclick="addItemToLeilao()">✅ Adicionar</button>
+                        <button class="btn btn-ghost" onclick="document.getElementById('addItemSection').style.display='none';_selectedCardLeilao=null;">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="items-grid" id="itensGrid"></div>
+        </div>
+
+        <!-- TAB: ARREMATANTES -->
+        <div id="tab-arrematantes" class="tab-content">
+            <div id="arrematantesPanel"></div>
+        </div>
+    </div>
+
+</div>
+
+<!-- MODAL: CRIAR LEILÃO -->
+<div id="createModal" class="modal">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeCreateModal()">×</button>
+        <h2>🏷️ Novo Leilão</h2>
+        <div class="form-group">
+            <label>Nome do Leilão *</label>
+            <input type="text" id="nomeLeilao" placeholder="Ex: Leilão Especial Junho">
+        </div>
+        <div class="form-group">
+            <label>Data</label>
+            <input type="date" id="dataLeilao">
+        </div>
+        <div class="form-group">
+            <label>Descrição (opcional)</label>
+            <textarea id="descLeilao" placeholder="Detalhes do leilão..."></textarea>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeCreateModal()">Cancelar</button>
+            <button class="btn btn-primary" onclick="confirmCreateLeilao()">✅ Criar Leilão</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: DEFINIR ARREMATANTE -->
+<div id="arrematanteModal" class="modal">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeArrematanteModal()">×</button>
+        <h2>👤 Definir Arrematante</h2>
+
+        <div class="form-group">
+            <label>🔍 Buscar player cadastrado</label>
+            <input type="text" id="arrUserSearch" placeholder="Nome ou email do player..." oninput="searchArrematanteUser()">
+            <div id="arrUserResults" style="margin-top:6px;max-height:200px;overflow-y:auto;"></div>
+            <div id="arrSelectedInfo">
+                <div class="user-avatar" id="arrSelectedAvatar">?</div>
+                <div style="flex:1;">
+                    <div class="user-name" id="arrSelectedName"></div>
+                    <div class="user-email" id="arrSelectedEmail"></div>
+                </div>
+                <button onclick="clearSelectedUser()" style="background:transparent;border:none;color:var(--text2);cursor:pointer;font-size:16px;">✕</button>
+            </div>
+        </div>
+
+        <div class="divider"><span>ou externo (sem cadastro)</span></div>
+
+        <div class="form-group">
+            <label>Nome do arrematante externo</label>
+            <input type="text" id="arrNomeExterno" placeholder="Ex: João Silva">
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeArrematanteModal()">Cancelar</button>
+            <button class="btn btn-primary" onclick="confirmArrematante()">✅ Confirmar</button>
+        </div>
+    </div>
+</div>
+
+<div id="notification" class="notification"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="js/firebase.js"></script>
+<script src="js/leilao.js"></script>
+<script>
+function switchTab(name, btn) {
+    document.querySelectorAll('.tab-content').forEach(function(t){ t.classList.remove('active'); });
+    document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+    document.getElementById('tab-'+name).classList.add('active');
+    btn.classList.add('active');
+}
+</script>
+</body>
+</html>
