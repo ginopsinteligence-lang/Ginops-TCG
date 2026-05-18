@@ -3,600 +3,503 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WYD Amigos do Bombom – Painel de Contas</title>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=MedievalSharp&family=Cinzel:wght@400;600;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <title>WYD – Amigos do Bombom</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --gold:    #D4A017;
-      --gold2:   #F0C040;
-      --brown:   #1a0e00;
-      --brown2:  #2d1a00;
-      --brown3:  #3a2800;
-      --brown4:  #5a4010;
-      --border:  #8B6914;
-      --text:    #e8c870;
-      --text2:   #9a7a3a;
-      --text3:   #7a5c20;
-      --red:     #8B0000;
-      --green:   #2d6a2d;
-      --blue:    #1a3a6a;
+      --gold:   #D4A017;
+      --gold2:  #F0C040;
+      --gold3:  #ffd966;
+      --br1:    #0d0700;
+      --br2:    #1a0e00;
+      --br3:    #2d1a00;
+      --br4:    #3a2800;
+      --br5:    #5a4010;
+      --border: #8B6914;
+      --text:   #e8c870;
+      --text2:  #a08040;
+      --text3:  #6a5020;
+      --red:    #8B0000;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { margin:0; padding:0; box-sizing:border-box; }
 
     body {
       font-family: 'Nunito', sans-serif;
-      background: #0d0700;
+      background: var(--br1);
       min-height: 100vh;
       color: var(--text);
       overflow-x: hidden;
     }
 
-    /* ── BACKGROUND ──────────────────────── */
     .bg-fx {
-      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      position:fixed; inset:0; z-index:0; pointer-events:none;
       background:
-        radial-gradient(ellipse at 20% 30%, rgba(139,105,20,.12) 0%, transparent 55%),
-        radial-gradient(ellipse at 80% 70%, rgba(100,50,0,.10) 0%, transparent 55%);
+        radial-gradient(ellipse at 15% 40%, rgba(139,105,20,.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 60%, rgba(100,50,0,.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 100%, rgba(80,40,0,.20) 0%, transparent 60%);
     }
     .bg-fx::after {
-      content: '';
-      position: absolute; inset: 0;
-      background-image:
-        repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(212,160,23,.03) 3px, rgba(212,160,23,.03) 4px);
+      content:''; position:absolute; inset:0;
+      background-image: repeating-linear-gradient(
+        0deg, transparent, transparent 3px,
+        rgba(212,160,23,.025) 3px, rgba(212,160,23,.025) 4px
+      );
     }
 
-    /* ── TELA DE LOGIN ───────────────────── */
+    /* ── LOGIN ── */
     #login-screen {
-      position: fixed; inset: 0; z-index: 100;
-      display: flex; align-items: center; justify-content: center;
-      background: radial-gradient(ellipse at center, #1a0e00 0%, #0a0500 100%);
+      position:fixed; inset:0; z-index:100;
+      display:flex; align-items:center; justify-content:center;
+      background: radial-gradient(ellipse at center, #1f0e00 0%, #080400 100%);
+      overflow:hidden;
     }
+
+    .login-char {
+      position:absolute; bottom:0;
+      height:78vh; opacity:.22; pointer-events:none;
+      filter: sepia(1) saturate(0.4) brightness(0.8);
+    }
+    .login-char.left  { left:-30px; transform:scaleX(-1); }
+    .login-char.right { right:-30px; }
 
     .login-box {
-      width: 360px;
-      border: 2px solid var(--border);
-      border-radius: 12px;
-      background: linear-gradient(160deg, #1f1000, #0d0700);
-      padding: 32px 28px;
-      box-shadow: 0 0 60px rgba(139,105,20,.3), inset 0 0 30px rgba(0,0,0,.5);
+      width:420px;
+      border:2px solid var(--border);
+      border-radius:16px;
+      background:linear-gradient(160deg,#231200,#0d0700);
+      padding:40px 36px;
+      box-shadow:0 0 90px rgba(139,105,20,.4), inset 0 0 40px rgba(0,0,0,.6);
+      position:relative; z-index:2;
     }
 
+    .login-orn {
+      text-align:center; font-size:30px; margin-bottom:12px;
+      filter: drop-shadow(0 0 10px rgba(212,160,23,.7));
+    }
     .login-title {
-      font-family: 'Cinzel', serif;
-      font-size: 22px;
-      font-weight: 900;
-      color: var(--gold);
-      text-align: center;
-      letter-spacing: 2px;
-      margin-bottom: 4px;
-      text-shadow: 0 0 20px rgba(212,160,23,.5);
+      font-family:'Cinzel',serif;
+      font-size:28px; font-weight:900;
+      color:var(--gold); text-align:center;
+      letter-spacing:3px;
+      text-shadow:0 0 30px rgba(212,160,23,.7);
+      margin-bottom:5px;
     }
     .login-sub {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 6px;
-      color: var(--text2);
-      text-align: center;
-      margin-bottom: 24px;
-      letter-spacing: 1px;
+      font-family:'Cinzel',serif; font-size:11px;
+      color:var(--text2); text-align:center;
+      letter-spacing:3px; margin-bottom:28px;
     }
-
-    .login-divider {
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--border), transparent);
-      margin-bottom: 24px;
+    .login-div {
+      height:1px;
+      background:linear-gradient(90deg,transparent,var(--border),transparent);
+      margin-bottom:28px;
     }
-
     .login-label {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 7px;
-      color: var(--text2);
-      display: block;
-      margin-bottom: 6px;
+      font-family:'Cinzel',serif; font-size:12px; font-weight:700;
+      color:var(--text2); display:block; margin-bottom:7px; letter-spacing:1px;
     }
-
     .login-input {
-      width: 100%;
-      padding: 10px 12px;
-      background: #120800;
-      border: 1px solid var(--brown4);
-      border-radius: 6px;
-      color: var(--gold2);
-      font-family: 'Nunito', sans-serif;
-      font-size: 14px;
-      font-weight: 700;
-      margin-bottom: 14px;
-      outline: none;
-      transition: border-color .2s;
+      width:100%; padding:13px 16px;
+      background:#0e0600; border:1px solid var(--br5);
+      border-radius:8px; color:var(--gold2);
+      font-family:'Nunito',sans-serif; font-size:17px; font-weight:700;
+      margin-bottom:18px; outline:none; transition:border-color .2s;
     }
-    .login-input:focus { border-color: var(--gold); }
-    .login-input::placeholder { color: var(--brown4); font-size: 12px; }
-
+    .login-input:focus { border-color:var(--gold); }
+    .login-input::placeholder { color:var(--text3); font-size:14px; font-weight:400; }
     .login-btn {
-      width: 100%;
-      padding: 12px;
-      background: linear-gradient(135deg, #8B6914, #D4A017);
-      border: none;
-      border-bottom: 3px solid #5a4010;
-      border-radius: 8px;
-      color: #0d0700;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 9px;
-      cursor: pointer;
-      letter-spacing: 1px;
-      transition: all .15s;
-      margin-top: 6px;
-      box-shadow: 0 4px 0 #3a2800;
+      width:100%; padding:16px;
+      background:linear-gradient(135deg,#7a5a10,#D4A017);
+      border:none; border-bottom:3px solid var(--br5);
+      border-radius:10px; color:#0d0700;
+      font-family:'Cinzel',serif; font-size:14px; font-weight:700;
+      letter-spacing:2px; cursor:pointer; transition:all .15s;
+      box-shadow:0 5px 0 #3a2800; margin-top:4px;
     }
-    .login-btn:hover { background: linear-gradient(135deg, #9a7820, #e8b820); transform: translateY(-1px); }
-    .login-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #3a2800; }
-
+    .login-btn:hover { filter:brightness(1.1); transform:translateY(-1px); }
+    .login-btn:active { transform:translateY(2px); box-shadow:0 2px 0 #3a2800; }
     .login-error {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 6px;
-      color: #ff4444;
-      text-align: center;
-      margin-top: 10px;
-      display: none;
-      background: rgba(204,0,0,.1);
-      padding: 8px;
-      border-radius: 4px;
+      font-family:'Cinzel',serif; font-size:11px; color:#ff5555;
+      text-align:center; margin-top:12px; display:none;
+      background:rgba(204,0,0,.12); padding:10px;
+      border-radius:7px; border:1px solid #660000;
     }
-
     .login-btn-tcg {
-      width: 100%;
-      padding: 10px;
-      background: transparent;
-      border: 1px solid var(--brown4);
-      border-radius: 6px;
-      color: var(--text2);
-      font-family: 'Press Start 2P', monospace;
-      font-size: 6px;
-      cursor: pointer;
-      margin-top: 10px;
-      transition: all .2s;
-      text-align: center;
-      text-decoration: none;
-      display: block;
+      width:100%; padding:12px;
+      background:transparent; border:1px solid var(--br5);
+      border-radius:8px; color:var(--text3);
+      font-family:'Cinzel',serif; font-size:11px; font-weight:600;
+      cursor:pointer; margin-top:12px; transition:all .2s;
+      text-align:center; text-decoration:none; display:block; letter-spacing:1px;
     }
-    .login-btn-tcg:hover { border-color: var(--border); color: var(--gold); }
+    .login-btn-tcg:hover { border-color:var(--border); color:var(--gold); }
 
-    /* ── PAINEL PRINCIPAL ────────────────── */
-    #app { position: relative; z-index: 1; display: none; min-height: 100vh; }
+    /* ── APP ── */
+    #app { position:relative; z-index:1; display:none; min-height:100vh; }
 
-    /* Header */
     .header {
-      background: linear-gradient(135deg, #1a0e00, #2d1a00);
-      border-bottom: 2px solid var(--border);
-      padding: 14px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky; top: 0; z-index: 50;
-      box-shadow: 0 4px 20px rgba(0,0,0,.5);
+      background:linear-gradient(135deg,#150900,#2a1500);
+      border-bottom:2px solid var(--border);
+      padding:18px 32px;
+      display:flex; align-items:center; justify-content:space-between;
+      position:sticky; top:0; z-index:50;
+      box-shadow:0 4px 30px rgba(0,0,0,.7);
     }
+    .header-left { display:flex; align-items:center; gap:16px; }
+    .header-shield { font-size:34px; filter:drop-shadow(0 0 10px rgba(212,160,23,.5)); }
     .header-brand {
-      font-family: 'Cinzel', serif;
-      font-size: 18px;
-      font-weight: 900;
-      color: var(--gold);
-      letter-spacing: 2px;
-      text-shadow: 0 0 15px rgba(212,160,23,.4);
+      font-family:'Cinzel',serif; font-size:24px; font-weight:900;
+      color:var(--gold); letter-spacing:3px;
+      text-shadow:0 0 20px rgba(212,160,23,.4);
     }
-    .header-sub { font-family: 'Press Start 2P', monospace; font-size: 5px; color: var(--text2); margin-top: 2px; }
-    .header-right { display: flex; align-items: center; gap: 12px; }
+    .header-sub {
+      font-family:'Cinzel',serif; font-size:10px;
+      color:var(--text3); letter-spacing:2px; margin-top:3px;
+    }
+    .header-right { display:flex; align-items:center; gap:12px; }
     .header-user {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 6px;
-      color: var(--gold);
-      background: var(--brown2);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 6px 10px;
+      font-family:'Cinzel',serif; font-size:14px; font-weight:700;
+      color:var(--gold); background:var(--br3);
+      border:1px solid var(--border); border-radius:8px; padding:9px 16px;
     }
     .btn-logout {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 6px;
-      color: var(--text2);
-      background: transparent;
-      border: 1px solid var(--brown4);
-      border-radius: 6px;
-      padding: 6px 10px;
-      cursor: pointer;
-      transition: all .2s;
+      font-family:'Cinzel',serif; font-size:12px; font-weight:600;
+      color:var(--text2); background:transparent;
+      border:1px solid var(--br5); border-radius:8px; padding:9px 16px;
+      cursor:pointer; transition:all .2s;
     }
-    .btn-logout:hover { border-color: var(--red); color: #ff6666; }
+    .btn-logout:hover { border-color:var(--red); color:#ff7777; }
 
-    /* Stats bar */
+    /* ── BANNER ── */
+    .deco-banner {
+      position:relative; height:180px; overflow:hidden;
+      background:linear-gradient(180deg,#1a0900 0%,#0d0700 100%);
+      border-bottom:2px solid var(--br4);
+      display:flex; align-items:center; justify-content:center;
+    }
+    .deco-banner::before {
+      content:''; position:absolute; inset:0;
+      background: radial-gradient(ellipse at 50% 130%, rgba(212,160,23,.18) 0%, transparent 65%);
+    }
+    .deco-char-l, .deco-char-r {
+      position:absolute; bottom:0; height:175px;
+      opacity:.55; pointer-events:none;
+      filter:drop-shadow(0 0 16px rgba(212,160,23,.35));
+      transition:opacity .3s;
+    }
+    .deco-char-l { left:60px; transform:scaleX(-1); }
+    .deco-char-r { right:60px; }
+    .deco-char-l:hover, .deco-char-r:hover { opacity:.8; }
+
+    /* chars extras nos cantos */
+    .deco-char-far-l, .deco-char-far-r {
+      position:absolute; bottom:0; height:155px;
+      opacity:.25; pointer-events:none;
+      filter:sepia(1) saturate(0.5);
+    }
+    .deco-char-far-l { left:0; transform:scaleX(-1); }
+    .deco-char-far-r { right:0; }
+
+    .deco-center {
+      position:relative; z-index:2; text-align:center;
+    }
+    .deco-ornament {
+      font-size:36px; margin-bottom:8px;
+      filter:drop-shadow(0 0 12px rgba(212,160,23,.8));
+    }
+    .deco-title {
+      font-family:'Cinzel',serif; font-size:14px; font-weight:700;
+      color:var(--text2); letter-spacing:5px; text-transform:uppercase;
+    }
+
+    /* ── STATS ── */
     .stats-bar {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      padding: 16px 24px;
+      display:grid; grid-template-columns:repeat(3,1fr);
+      gap:16px; padding:22px 32px;
     }
     .stat-card {
-      background: #120800;
-      border: 1px solid var(--brown3);
-      border-radius: 8px;
-      padding: 12px 16px;
-      text-align: center;
+      background:linear-gradient(135deg,#130900,#0d0600);
+      border:1px solid var(--br4); border-radius:12px;
+      padding:18px 22px; text-align:center;
+      position:relative; overflow:hidden;
     }
-    .stat-num { color: var(--gold); font-size: 22px; font-weight: 800; }
-    .stat-label { font-family: 'Press Start 2P', monospace; font-size: 5px; color: var(--text3); margin-top: 4px; }
+    .stat-card::before {
+      content:''; position:absolute; inset:0;
+      background:radial-gradient(ellipse at 50% 0%,rgba(212,160,23,.07),transparent 70%);
+    }
+    .stat-icon { font-size:26px; margin-bottom:7px; }
+    .stat-num { color:var(--gold2); font-size:32px; font-weight:800; line-height:1; }
+    .stat-label {
+      font-family:'Cinzel',serif; font-size:12px;
+      color:var(--text3); margin-top:6px; letter-spacing:1px;
+    }
 
-    /* Main grid */
+    /* ── MAIN GRID ── */
     .main-grid {
-      display: grid;
-      grid-template-columns: 220px 1fr;
-      gap: 16px;
-      padding: 0 24px 24px;
+      display:grid; grid-template-columns:260px 1fr;
+      gap:20px; padding:0 32px 36px;
     }
 
-    /* Sidebar */
+    /* ── SIDEBAR ── */
     .sidebar {
-      background: #0f0800;
-      border: 1px solid var(--brown3);
-      border-radius: 10px;
-      padding: 14px;
+      background:linear-gradient(160deg,#130900,#0d0600);
+      border:1px solid var(--br4); border-radius:14px; padding:20px;
     }
     .section-title {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 6px;
-      color: var(--text2);
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--brown3);
+      font-family:'Cinzel',serif; font-size:13px; font-weight:700;
+      color:var(--text2); letter-spacing:2px; text-transform:uppercase;
+      margin-bottom:14px; padding-bottom:10px;
+      border-bottom:1px solid var(--br4);
+      display:flex; align-items:center; gap:8px;
     }
-    .server-list { margin-bottom: 18px; }
     .server-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-      margin-bottom: 4px;
-      color: var(--text);
-      font-size: 12px;
-      font-weight: 600;
-      transition: all .15s;
-      border: 1px solid transparent;
+      display:flex; align-items:center; gap:10px;
+      padding:11px 13px; border-radius:9px; cursor:pointer;
+      margin-bottom:6px; color:var(--text);
+      font-size:15px; font-weight:700;
+      transition:all .15s; border:1px solid transparent;
     }
-    .server-item:hover { background: var(--brown2); border-color: var(--brown4); }
-    .server-item.active { background: var(--brown2); border-color: var(--border); color: var(--gold); }
-    .server-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-    .dot-online { background: #4CAF50; box-shadow: 0 0 6px #4CAF50; }
-    .dot-offline { background: #555; }
-    .server-count { margin-left: auto; font-family: 'Press Start 2P', monospace; font-size: 5px; color: var(--text3); }
-
+    .server-item:hover { background:var(--br3); border-color:var(--br5); }
+    .server-item.active { background:var(--br3); border-color:var(--border); color:var(--gold); }
+    .server-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+    .dot-on  { background:#4CAF50; box-shadow:0 0 8px #4CAF50; }
+    .dot-off { background:#555; }
+    .server-count {
+      margin-left:auto;
+      font-family:'Cinzel',serif; font-size:12px; color:var(--text3);
+      background:var(--br4); border-radius:5px; padding:2px 8px;
+    }
     .btn-add-server {
-      width: 100%;
-      padding: 8px;
-      background: transparent;
-      border: 1px dashed var(--brown4);
-      border-radius: 6px;
-      color: var(--text3);
-      font-family: 'Press Start 2P', monospace;
-      font-size: 6px;
-      cursor: pointer;
-      margin-top: 6px;
-      transition: all .2s;
+      width:100%; padding:11px;
+      background:transparent; border:1px dashed var(--br5);
+      border-radius:9px; color:var(--text3);
+      font-family:'Cinzel',serif; font-size:12px; font-weight:600;
+      cursor:pointer; margin-top:9px; transition:all .2s; letter-spacing:1px;
     }
-    .btn-add-server:hover { border-color: var(--border); color: var(--gold); }
+    .btn-add-server:hover { border-color:var(--border); color:var(--gold); }
 
-    /* Main content */
-    .main-content { min-width: 0; }
+    .filter-label {
+      font-family:'Cinzel',serif; font-size:11px;
+      color:var(--text3); margin-bottom:7px; letter-spacing:1px;
+    }
+    .modal-select {
+      width:100%; padding:10px 13px;
+      background:#0a0500; border:1px solid var(--br5);
+      border-radius:8px; color:var(--gold2);
+      font-family:'Nunito',sans-serif; font-size:15px; font-weight:600;
+      outline:none; transition:border-color .2s;
+    }
+    .modal-select:focus { border-color:var(--gold); }
+    .modal-select option { background:#1a0e00; }
 
+    /* ── CONTENT ── */
+    .main-content { min-width:0; }
     .content-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:18px;
     }
     .content-title {
-      font-family: 'Cinzel', serif;
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--gold);
+      font-family:'Cinzel',serif; font-size:20px; font-weight:700;
+      color:var(--gold); letter-spacing:1px;
     }
     .btn-add {
-      background: linear-gradient(135deg, #6a4a10, #8B6914);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--gold2);
-      font-family: 'Press Start 2P', monospace;
-      font-size: 6px;
-      padding: 8px 14px;
-      cursor: pointer;
-      transition: all .15s;
+      background:linear-gradient(135deg,#6a4a10,#8B6914);
+      border:1px solid var(--border); border-radius:8px;
+      color:var(--gold2); font-family:'Cinzel',serif;
+      font-size:13px; font-weight:700;
+      padding:11px 20px; cursor:pointer; transition:all .15s; letter-spacing:1px;
     }
-    .btn-add:hover { background: linear-gradient(135deg, #7a5a20, #9a7820); }
+    .btn-add:hover { filter:brightness(1.15); }
 
-    /* Account card */
+    /* ── ACCOUNT CARD ── */
     .account-card {
-      background: #0f0800;
-      border: 1px solid var(--brown3);
-      border-radius: 10px;
-      padding: 14px;
-      margin-bottom: 10px;
-      transition: border-color .2s;
-      cursor: pointer;
+      background:linear-gradient(135deg,#130900,#0d0600);
+      border:1px solid var(--br4); border-radius:14px; padding:18px;
+      margin-bottom:13px; transition:border-color .2s, box-shadow .2s; cursor:pointer;
     }
-    .account-card:hover { border-color: var(--brown4); }
-    .account-card.selected { border-color: var(--border); background: #150c00; }
-
-    .account-top {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+    .account-card:hover { border-color:var(--br5); box-shadow:0 4px 24px rgba(0,0,0,.4); }
+    .account-card.selected { border-color:var(--border); background:linear-gradient(135deg,#1a0c00,#110800); }
+    .account-top { display:flex; align-items:center; gap:15px; }
     .account-avatar {
-      width: 44px; height: 44px;
-      border-radius: 8px;
-      background: var(--brown2);
-      border: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 20px;
-      flex-shrink: 0;
+      width:56px; height:56px; border-radius:11px;
+      background:var(--br3); border:1px solid var(--border);
+      display:flex; align-items:center; justify-content:center;
+      font-size:28px; flex-shrink:0;
     }
-    .account-name { color: var(--gold2); font-size: 15px; font-weight: 700; }
-    .account-sub { font-family: 'Press Start 2P', monospace; font-size: 6px; color: var(--text3); margin-top: 3px; }
-    .account-tags { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+    .account-name { color:var(--gold2); font-size:19px; font-weight:800; }
+    .account-sub {
+      font-family:'Cinzel',serif; font-size:12px;
+      color:var(--text3); margin-top:3px; letter-spacing:1px;
+    }
+    .account-tags { display:flex; gap:8px; margin-top:9px; flex-wrap:wrap; }
     .tag {
-      background: var(--brown2);
-      border: 1px solid var(--brown3);
-      border-radius: 4px;
-      color: var(--text);
-      font-family: 'Press Start 2P', monospace;
-      font-size: 5px;
-      padding: 3px 7px;
+      background:var(--br3); border:1px solid var(--br4);
+      border-radius:6px; color:var(--text);
+      font-family:'Cinzel',serif; font-size:11px; font-weight:600;
+      padding:4px 10px; letter-spacing:.5px;
     }
-    .tag.gold { border-color: var(--border); color: var(--gold); }
-    .tag.secret { background: #1a0000; border-color: #660000; color: #ff9999; }
-    .account-actions { margin-left: auto; display: flex; gap: 6px; }
+    .tag.gold { border-color:var(--border); color:var(--gold); }
+    .account-actions { margin-left:auto; display:flex; gap:8px; }
     .icon-btn {
-      width: 32px; height: 32px;
-      background: var(--brown2);
-      border: 1px solid var(--brown3);
-      border-radius: 6px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer;
-      color: var(--text2);
-      font-size: 14px;
-      transition: all .2s;
+      width:38px; height:38px;
+      background:var(--br3); border:1px solid var(--br4);
+      border-radius:8px; display:flex; align-items:center; justify-content:center;
+      cursor:pointer; font-size:17px; color:var(--text2); transition:all .2s;
     }
-    .icon-btn:hover { border-color: var(--border); color: var(--gold); }
+    .icon-btn:hover { border-color:var(--border); color:var(--gold); }
 
-    /* Inventory panel */
+    /* ── INVENTORY ── */
     .inventory-panel {
-      background: #0f0800;
-      border: 1px solid var(--brown3);
-      border-radius: 10px;
-      padding: 14px;
-      margin-top: 14px;
+      background:linear-gradient(135deg,#130900,#0d0600);
+      border:1px solid var(--br4); border-radius:14px; padding:20px; margin-top:18px;
     }
     .inv-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-      gap: 8px;
-      margin-top: 10px;
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+      gap:11px; margin-top:14px;
     }
     .inv-slot {
-      aspect-ratio: 4/3;
-      background: #0a0500;
-      border: 1px dashed var(--brown4);
-      border-radius: 6px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all .2s;
-      position: relative;
-      overflow: hidden;
+      aspect-ratio:4/3; background:#080400;
+      border:1px dashed var(--br5); border-radius:9px;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      cursor:pointer; transition:all .2s; position:relative; overflow:hidden;
     }
-    .inv-slot:hover { border-color: var(--border); }
-    .inv-slot img {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      border-radius: 5px;
-    }
-    .inv-slot-label {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 5px;
-      color: var(--text3);
-      margin-top: 6px;
-    }
+    .inv-slot:hover { border-color:var(--border); }
+    .inv-slot img { width:100%; height:100%; object-fit:cover; border-radius:8px; }
     .inv-slot-overlay {
-      position: absolute; inset: 0;
-      background: rgba(0,0,0,.5);
-      display: flex; align-items: center; justify-content: center;
-      opacity: 0;
-      border-radius: 5px;
-      transition: opacity .2s;
+      position:absolute; inset:0; background:rgba(0,0,0,.55);
+      display:flex; align-items:center; justify-content:center;
+      opacity:0; border-radius:8px; transition:opacity .2s; font-size:26px;
     }
-    .inv-slot:hover .inv-slot-overlay { opacity: 1; }
+    .inv-slot:hover .inv-slot-overlay { opacity:1; }
     .inv-slot-name {
-      position: absolute; bottom: 0; left: 0; right: 0;
-      background: rgba(0,0,0,.7);
-      font-family: 'Press Start 2P', monospace;
-      font-size: 5px;
-      color: var(--gold);
-      padding: 4px;
-      text-align: center;
+      position:absolute; bottom:0; left:0; right:0;
+      background:rgba(0,0,0,.75);
+      font-family:'Cinzel',serif; font-size:10px; color:var(--gold);
+      padding:5px; text-align:center;
     }
-    .inv-add {
-      color: var(--text3);
-      font-size: 22px;
+    .inv-add { color:var(--text3); font-size:30px; }
+    .inv-slot-label {
+      font-family:'Cinzel',serif; font-size:10px;
+      color:var(--text3); margin-top:7px; letter-spacing:1px;
     }
-    .inv-slot.add-slot { border-style: dashed; }
-    .inv-slot.add-slot:hover .inv-add { color: var(--gold); }
 
-    /* Modal */
+    /* ── MODAL ── */
     .modal-overlay {
-      position: fixed; inset: 0; z-index: 200;
-      background: rgba(0,0,0,.85);
-      display: none;
-      align-items: center;
-      justify-content: center;
+      position:fixed; inset:0; z-index:200;
+      background:rgba(0,0,0,.88);
+      display:none; align-items:center; justify-content:center;
     }
-    .modal-overlay.open { display: flex; }
+    .modal-overlay.open { display:flex; }
     .modal-box {
-      background: linear-gradient(160deg, #1f1000, #0d0700);
-      border: 2px solid var(--border);
-      border-radius: 12px;
-      padding: 28px;
-      width: 400px;
-      max-width: 95vw;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 0 60px rgba(139,105,20,.3);
+      background:linear-gradient(160deg,#231200,#0d0700);
+      border:2px solid var(--border); border-radius:16px; padding:32px;
+      width:440px; max-width:95vw; max-height:90vh; overflow-y:auto;
+      box-shadow:0 0 80px rgba(139,105,20,.4);
     }
     .modal-title {
-      font-family: 'Cinzel', serif;
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--gold);
-      margin-bottom: 20px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--brown3);
+      font-family:'Cinzel',serif; font-size:20px; font-weight:700;
+      color:var(--gold); margin-bottom:24px; padding-bottom:14px;
+      border-bottom:1px solid var(--br4); letter-spacing:1px;
     }
     .modal-label {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 6px;
-      color: var(--text2);
-      display: block;
-      margin-bottom: 5px;
-      margin-top: 12px;
+      font-family:'Cinzel',serif; font-size:12px; font-weight:600;
+      color:var(--text2); display:block; margin-bottom:7px; margin-top:15px; letter-spacing:1px;
     }
-    .modal-input, .modal-select {
-      width: 100%;
-      padding: 9px 12px;
-      background: #0a0500;
-      border: 1px solid var(--brown4);
-      border-radius: 6px;
-      color: var(--gold2);
-      font-family: 'Nunito', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      outline: none;
-      transition: border-color .2s;
+    .modal-input {
+      width:100%; padding:11px 15px;
+      background:#0a0500; border:1px solid var(--br5);
+      border-radius:8px; color:var(--gold2);
+      font-family:'Nunito',sans-serif; font-size:16px; font-weight:600;
+      outline:none; transition:border-color .2s;
     }
-    .modal-input:focus, .modal-select:focus { border-color: var(--gold); }
-    .modal-select option { background: #1a0e00; }
+    .modal-input:focus { border-color:var(--gold); }
     .modal-hint {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 5px;
-      color: var(--red);
-      margin-top: 4px;
+      font-family:'Cinzel',serif; font-size:10px;
+      color:var(--red); margin-top:5px; letter-spacing:.5px;
     }
-    .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+    .modal-actions { display:flex; gap:13px; margin-top:24px; }
     .btn-save {
-      flex: 1; padding: 10px;
-      background: linear-gradient(135deg, #8B6914, #D4A017);
-      border: none; border-radius: 7px;
-      color: #0d0700;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 7px;
-      cursor: pointer;
-      transition: all .15s;
+      flex:1; padding:13px;
+      background:linear-gradient(135deg,#8B6914,#D4A017);
+      border:none; border-radius:9px; color:#0d0700;
+      font-family:'Cinzel',serif; font-size:13px; font-weight:700;
+      cursor:pointer; transition:all .15s; letter-spacing:1px;
     }
-    .btn-save:hover { opacity: .9; }
+    .btn-save:hover { filter:brightness(1.1); }
     .btn-cancel {
-      flex: 1; padding: 10px;
-      background: transparent;
-      border: 1px solid var(--brown4);
-      border-radius: 7px;
-      color: var(--text2);
-      font-family: 'Press Start 2P', monospace;
-      font-size: 7px;
-      cursor: pointer;
-      transition: all .15s;
+      flex:1; padding:13px;
+      background:transparent; border:1px solid var(--br5);
+      border-radius:9px; color:var(--text2);
+      font-family:'Cinzel',serif; font-size:13px; font-weight:600;
+      cursor:pointer; transition:all .15s; letter-spacing:1px;
     }
-    .btn-cancel:hover { border-color: var(--red); color: #ff6666; }
+    .btn-cancel:hover { border-color:var(--red); color:#ff7777; }
+    .btn-del {
+      background:transparent; border:1px solid #660000;
+      border-radius:8px; color:#ff7777;
+      font-family:'Cinzel',serif; font-size:12px; font-weight:600;
+      padding:9px 14px; cursor:pointer; transition:all .2s;
+      margin-top:15px; width:100%; letter-spacing:1px;
+    }
+    .btn-del:hover { background:rgba(204,0,0,.15); }
 
     .empty-msg {
-      text-align: center;
-      padding: 30px;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 7px;
-      color: var(--text3);
-      line-height: 2;
+      text-align:center; padding:50px;
+      font-family:'Cinzel',serif; font-size:14px;
+      color:var(--text3); line-height:2.5; letter-spacing:1px;
     }
 
-    /* Delete btn */
-    .btn-del {
-      background: transparent;
-      border: 1px solid #660000;
-      border-radius: 6px;
-      color: #ff6666;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 6px;
-      padding: 6px 10px;
-      cursor: pointer;
-      transition: all .2s;
-      margin-top: 12px;
-      width: 100%;
-    }
-    .btn-del:hover { background: rgba(204,0,0,.15); }
+    ::-webkit-scrollbar { width:6px; }
+    ::-webkit-scrollbar-track { background:#0a0500; }
+    ::-webkit-scrollbar-thumb { background:var(--br5); border-radius:3px; }
+    ::-webkit-scrollbar-thumb:hover { background:var(--border); }
 
-    /* Upload area */
-    .upload-area {
-      border: 2px dashed var(--brown4);
-      border-radius: 8px;
-      padding: 20px;
-      text-align: center;
-      cursor: pointer;
-      margin-top: 8px;
-      transition: all .2s;
-    }
-    .upload-area:hover { border-color: var(--border); }
-    .upload-area p { font-family: 'Press Start 2P', monospace; font-size: 6px; color: var(--text3); margin-top: 8px; }
-
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: #0a0500; }
-    ::-webkit-scrollbar-thumb { background: var(--brown4); border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--border); }
-
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    .fade-in { animation: fadeIn .3s ease; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .fade-in { animation:fadeIn .3s ease; }
   </style>
 </head>
 <body>
 
 <div class="bg-fx"></div>
 
-<!-- ── LOGIN ──────────────────────────────── -->
+<!-- LOGIN -->
 <div id="login-screen">
-  <div class="login-box">
-    <div class="login-title">⚔ AMIGOS DO BOMBOM</div>
-    <div class="login-sub">WYD – SISTEMA DE GESTÃO DE CONTAS</div>
-    <div class="login-divider"></div>
+  <img class="login-char left"
+       src="https://wydbr.com/images/classes/transknight.png"
+       onerror="this.style.display='none'" alt="">
+  <img class="login-char right"
+       src="https://wydbr.com/images/classes/foema.png"
+       onerror="this.style.display='none'" alt="">
 
-    <label class="login-label">▶ USUÁRIO</label>
+  <div class="login-box">
+    <div class="login-orn">⚔️ 🛡️ ⚔️</div>
+    <div class="login-title">AMIGOS DO BOMBOM</div>
+    <div class="login-sub">WITH YOUR DESTINY</div>
+    <div class="login-div"></div>
+
+    <label class="login-label">USUÁRIO</label>
     <input type="text" id="login-user" class="login-input" placeholder="seu usuário">
 
-    <label class="login-label">▶ SENHA</label>
+    <label class="login-label">SENHA</label>
     <input type="password" id="login-pass" class="login-input" placeholder="••••••••">
 
-    <button class="login-btn" onclick="doLogin()">▶ ENTRAR NO SERVIDOR ◀</button>
+    <button class="login-btn" onclick="doLogin()">⚔ ENTRAR NO SERVIDOR</button>
     <div class="login-error" id="login-error">USUÁRIO OU SENHA INCORRETOS!</div>
-
     <a href="../index.html" class="login-btn-tcg">← VOLTAR AO TCG GINOPS</a>
   </div>
 </div>
 
-<!-- ── APP ────────────────────────────────── -->
+<!-- APP -->
 <div id="app">
 
-  <!-- Header -->
   <div class="header">
-    <div>
-      <div class="header-brand">⚔ AMIGOS DO BOMBOM</div>
-      <div class="header-sub">WYD – GERENCIADOR DE CONTAS – WITH YOUR DESTINY</div>
+    <div class="header-left">
+      <div class="header-shield">🛡️</div>
+      <div>
+        <div class="header-brand">AMIGOS DO BOMBOM</div>
+        <div class="header-sub">WYD – GERENCIADOR DE CONTAS</div>
+      </div>
     </div>
     <div class="header-right">
       <div class="header-user" id="header-user">👤 –</div>
@@ -604,17 +507,43 @@
     </div>
   </div>
 
+  <!-- Banner decorativo com personagens -->
+  <div class="deco-banner">
+    <!-- cantos exteriores (mais transparentes) -->
+    <img class="deco-char-far-l"
+         src="https://wydbr.com/images/classes/hunter.png"
+         onerror="this.style.display='none'" alt="">
+    <img class="deco-char-far-r"
+         src="https://wydbr.com/images/classes/mage.png"
+         onerror="this.style.display='none'" alt="">
+    <!-- chars principais -->
+    <img class="deco-char-l"
+         src="https://wydbr.com/images/classes/transknight.png"
+         onerror="this.style.display='none'" alt="">
+    <img class="deco-char-r"
+         src="https://wydbr.com/images/classes/foema.png"
+         onerror="this.style.display='none'" alt="">
+
+    <div class="deco-center">
+      <div class="deco-ornament">⚔️ 🔥 ⚔️</div>
+      <div class="deco-title">GERENCIADOR DE CONTAS WYD</div>
+    </div>
+  </div>
+
   <!-- Stats -->
   <div class="stats-bar">
     <div class="stat-card">
+      <div class="stat-icon">🌐</div>
       <div class="stat-num" id="stat-servers">0</div>
       <div class="stat-label">SERVIDORES</div>
     </div>
     <div class="stat-card">
+      <div class="stat-icon">⚔️</div>
       <div class="stat-num" id="stat-accounts">0</div>
       <div class="stat-label">CONTAS</div>
     </div>
     <div class="stat-card">
+      <div class="stat-icon">📸</div>
       <div class="stat-num" id="stat-images">0</div>
       <div class="stat-label">PRINTS</div>
     </div>
@@ -622,44 +551,37 @@
 
   <!-- Main -->
   <div class="main-grid">
-
-    <!-- Sidebar -->
     <div class="sidebar">
-      <div class="section-title">⚡ SERVIDORES</div>
-      <div class="server-list" id="server-list"></div>
+      <div class="section-title">🌐 SERVIDORES</div>
+      <div id="server-list"></div>
       <button class="btn-add-server" onclick="openServerModal()">+ NOVO SERVIDOR</button>
 
-      <div class="section-title" style="margin-top:20px;">🔎 FILTROS</div>
-      <div style="margin-top:6px;">
-        <div style="font-family:'Press Start 2P',monospace;font-size:5px;color:var(--text3);margin-bottom:4px;">CLASSE</div>
-        <select id="filter-class" class="modal-select" style="font-size:11px;padding:6px 8px;" onchange="renderAccounts()">
-          <option value="">TODAS</option>
-          <option value="Hunter">Hunter</option>
-          <option value="Mage">Mage</option>
-          <option value="BM">Battle Mage</option>
-          <option value="HB">Holy Bless</option>
-          <option value="Transknight">Transknight</option>
-          <option value="Foema">Foema</option>
-          <option value="Bestmaster">Bestmaster</option>
-          <option value="Outra">Outra</option>
-        </select>
-      </div>
+      <div class="section-title" style="margin-top:26px;">🔎 FILTROS</div>
+      <div class="filter-label" style="margin-top:9px;">CLASSE</div>
+      <select id="filter-class" class="modal-select" onchange="renderAccounts()">
+        <option value="">TODAS</option>
+        <option value="Hunter">Hunter</option>
+        <option value="Mage">Mage</option>
+        <option value="BM">Battle Mage</option>
+        <option value="HB">Holy Bless</option>
+        <option value="Transknight">Transknight</option>
+        <option value="Foema">Foema</option>
+        <option value="Bestmaster">Bestmaster</option>
+        <option value="Outra">Outra</option>
+      </select>
     </div>
 
-    <!-- Content -->
     <div class="main-content">
       <div class="content-header">
         <div class="content-title" id="content-title">Selecione um servidor ←</div>
         <button class="btn-add" id="btn-new-account" onclick="openAccountModal()" style="display:none;">+ NOVA CONTA</button>
       </div>
-
       <div id="accounts-list"></div>
 
-      <!-- Inventory panel -->
       <div class="inventory-panel" id="inv-panel" style="display:none;">
         <div class="content-header" style="margin-bottom:0;">
-          <div class="section-title" style="margin:0;" id="inv-title">INVENTÁRIO</div>
-          <button class="btn-add" onclick="openImageModal()" style="font-size:5px;padding:6px 10px;">+ PRINT</button>
+          <div class="section-title" style="margin:0;" id="inv-title">📸 INVENTÁRIO</div>
+          <button class="btn-add" onclick="openImageModal()" style="font-size:12px;padding:9px 15px;">+ PRINT</button>
         </div>
         <div class="inv-grid" id="inv-grid"></div>
       </div>
@@ -667,12 +589,10 @@
   </div>
 </div>
 
-<!-- ── MODALS ──────────────────────────────── -->
-
 <!-- Modal Servidor -->
 <div class="modal-overlay" id="modal-server">
   <div class="modal-box">
-    <div class="modal-title">⚡ NOVO SERVIDOR</div>
+    <div class="modal-title">🌐 NOVO SERVIDOR</div>
     <label class="modal-label">NOME DO SERVIDOR</label>
     <input type="text" id="srv-name" class="modal-input" placeholder="ex: Servidor Eden">
     <label class="modal-label">STATUS</label>
@@ -691,10 +611,8 @@
 <div class="modal-overlay" id="modal-account">
   <div class="modal-box">
     <div class="modal-title" id="modal-acc-title">⚔ NOVA CONTA</div>
-
-    <label class="modal-label">NOME DA CONTA / NICK</label>
+    <label class="modal-label">NICK / NOME</label>
     <input type="text" id="acc-nick" class="modal-input" placeholder="ex: MageKing99">
-
     <label class="modal-label">CLASSE</label>
     <select id="acc-class" class="modal-select">
       <option value="Hunter">Hunter</option>
@@ -706,18 +624,14 @@
       <option value="Bestmaster">Bestmaster</option>
       <option value="Outra">Outra</option>
     </select>
-
     <label class="modal-label">NÍVEL</label>
     <input type="number" id="acc-level" class="modal-input" placeholder="ex: 385" min="1" max="999">
-
     <label class="modal-label">LOGIN DO JOGO</label>
     <input type="text" id="acc-login" class="modal-input" placeholder="login da conta WYD">
-
     <label class="modal-label">SENHA DO JOGO</label>
     <input type="password" id="acc-password" class="modal-input" placeholder="senha da conta WYD">
-    <div class="modal-hint">🔒 Dados criptografados no Firebase</div>
-
-    <label class="modal-label">TAG / TIPO</label>
+    <div class="modal-hint">🔒 Salvo no Firebase da GinOps</div>
+    <label class="modal-label">TAG</label>
     <select id="acc-tag" class="modal-select">
       <option value="Principal">Principal</option>
       <option value="Farm">Farm</option>
@@ -725,10 +639,8 @@
       <option value="Storage">Storage</option>
       <option value="Outra">Outra</option>
     </select>
-
     <label class="modal-label">NOTAS</label>
     <input type="text" id="acc-notes" class="modal-input" placeholder="observações livres...">
-
     <div class="modal-actions">
       <button class="btn-save" onclick="saveAccount()">SALVAR</button>
       <button class="btn-cancel" onclick="closeModal('modal-account')">CANCELAR</button>
@@ -737,17 +649,15 @@
   </div>
 </div>
 
-<!-- Modal Upload Imagem -->
+<!-- Modal Imagem -->
 <div class="modal-overlay" id="modal-image">
   <div class="modal-box">
     <div class="modal-title">📸 ADICIONAR PRINT</div>
     <label class="modal-label">NOME / DESCRIÇÃO</label>
     <input type="text" id="img-name" class="modal-input" placeholder="ex: Inventário Principal">
-
     <label class="modal-label">URL DA IMAGEM</label>
-    <input type="url" id="img-url" class="modal-input" placeholder="https://... (Cole a URL da imagem)">
-    <div class="modal-hint">Dica: Use imgur.com ou postimages.org para hospedar seus prints</div>
-
+    <input type="url" id="img-url" class="modal-input" placeholder="https://i.imgur.com/...">
+    <div class="modal-hint">💡 Use imgur.com ou postimages.org para hospedar prints</div>
     <div class="modal-actions">
       <button class="btn-save" onclick="saveImage()">SALVAR</button>
       <button class="btn-cancel" onclick="closeModal('modal-image')">CANCELAR</button>
@@ -755,21 +665,25 @@
   </div>
 </div>
 
-<!-- Modal Visualizar Imagem -->
+<!-- Modal Ver Imagem -->
 <div class="modal-overlay" id="modal-view-img" onclick="closeModal('modal-view-img')">
-  <div style="position:relative;max-width:90vw;max-height:90vh;">
-    <img id="view-img-src" src="" alt="" style="max-width:90vw;max-height:85vh;border-radius:8px;border:2px solid var(--border);">
-    <div style="text-align:center;margin-top:8px;font-family:'Press Start 2P',monospace;font-size:7px;color:var(--gold);" id="view-img-name"></div>
-    <button onclick="deleteImage()" style="margin-top:8px;background:rgba(139,0,0,.5);border:1px solid #660000;border-radius:6px;color:#ff9999;font-family:'Press Start 2P',monospace;font-size:6px;padding:6px 12px;cursor:pointer;width:100%;">🗑 EXCLUIR ESTE PRINT</button>
+  <div style="position:relative;max-width:90vw;max-height:90vh;" onclick="event.stopPropagation()">
+    <img id="view-img-src" src="" alt=""
+         style="max-width:90vw;max-height:80vh;border-radius:12px;border:2px solid var(--border);display:block;">
+    <div style="text-align:center;margin-top:12px;font-family:'Cinzel',serif;font-size:14px;color:var(--gold);letter-spacing:1px;"
+         id="view-img-name"></div>
+    <button onclick="deleteImage()"
+            style="margin-top:10px;background:rgba(139,0,0,.4);border:1px solid #660000;border-radius:9px;
+                   color:#ff9999;font-family:'Cinzel',serif;font-size:12px;font-weight:600;
+                   padding:10px 16px;cursor:pointer;width:100%;letter-spacing:1px;">
+      🗑 EXCLUIR ESTE PRINT
+    </button>
   </div>
 </div>
 
-<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
 <script>
-// ── FIREBASE CONFIG ────────────────────────────────────────────────────────
 const firebaseConfig = {
   apiKey: "AIzaSyAFYr9fV20jGpmTlSaYtlKVMxzz1Ksl4ME",
   authDomain: "ginops-tcg-7ea05.firebaseapp.com",
@@ -781,29 +695,19 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// ── USUÁRIOS AUTORIZADOS ──────────────────────────────────────────────────
-// Coloque aqui os usuários e senhas dos dois jogadores
 const USERS = {
   "casado": "281090",
   "exboom": "eunaosei"
 };
 
-// ── ESTADO ────────────────────────────────────────────────────────────────
-let currentUser = null;
-let currentServer = null;
-let currentAccount = null;
-let editingAccountId = null;
-let viewingImageIdx = null;
+let currentUser = null, currentServer = null, currentAccount = null;
+let editingAccountId = null, viewingImageIdx = null;
+let servers = [], accounts = [];
 
-let servers   = [];
-let accounts  = [];
-
-// ── LOGIN ─────────────────────────────────────────────────────────────────
 function doLogin() {
   const u = document.getElementById('login-user').value.trim().toLowerCase();
   const p = document.getElementById('login-pass').value;
   const err = document.getElementById('login-error');
-
   if (USERS[u] && USERS[u] === p) {
     currentUser = u;
     localStorage.setItem('wyd_user', u);
@@ -826,7 +730,6 @@ function doLogout() {
   document.getElementById('login-pass').value = '';
 }
 
-// Auto-login se sessão salva
 window.addEventListener('load', () => {
   const saved = localStorage.getItem('wyd_user');
   if (saved && USERS[saved]) {
@@ -836,14 +739,11 @@ window.addEventListener('load', () => {
     document.getElementById('header-user').textContent = '👤 ' + saved.toUpperCase();
     loadServers();
   }
-
-  // Enter no login
   document.getElementById('login-pass').addEventListener('keydown', e => {
     if (e.key === 'Enter') doLogin();
   });
 });
 
-// ── SERVIDORES ────────────────────────────────────────────────────────────
 function loadServers() {
   db.collection('wyd_servers').orderBy('name').onSnapshot(snap => {
     servers = [];
@@ -855,32 +755,28 @@ function loadServers() {
 function renderServers() {
   const list = document.getElementById('server-list');
   list.innerHTML = '';
-
-  if (servers.length === 0) {
-    list.innerHTML = '<div style="font-family:\'Press Start 2P\',monospace;font-size:5px;color:var(--text3);padding:8px;text-align:center;">Nenhum servidor</div>';
+  if (!servers.length) {
+    list.innerHTML = '<div style="font-family:Cinzel,serif;font-size:12px;color:var(--text3);padding:12px;text-align:center;">Nenhum servidor</div>';
     return;
   }
-
   servers.forEach(srv => {
     const div = document.createElement('div');
     div.className = 'server-item' + (currentServer?.id === srv.id ? ' active' : '');
     div.innerHTML = `
-      <div class="server-dot ${srv.status === 'online' ? 'dot-online' : 'dot-offline'}"></div>
+      <div class="server-dot ${srv.status === 'online' ? 'dot-on' : 'dot-off'}"></div>
       <span>${srv.name}</span>
       <span class="server-count">${srv.accountCount || 0}</span>
     `;
     div.onclick = () => selectServer(srv);
     list.appendChild(div);
   });
-
   updateStats();
 }
 
 function selectServer(srv) {
-  currentServer = srv;
-  currentAccount = null;
+  currentServer = srv; currentAccount = null;
   renderServers();
-  document.getElementById('content-title').textContent = `⚔ ${srv.name}`;
+  document.getElementById('content-title').textContent = '⚔ ' + srv.name;
   document.getElementById('btn-new-account').style.display = 'inline-block';
   document.getElementById('inv-panel').style.display = 'none';
   loadAccounts();
@@ -899,7 +795,6 @@ async function saveServer() {
   closeModal('modal-server');
 }
 
-// ── CONTAS ────────────────────────────────────────────────────────────────
 function loadAccounts() {
   if (!currentServer) return;
   db.collection('wyd_accounts')
@@ -909,21 +804,18 @@ function loadAccounts() {
       accounts = [];
       snap.forEach(doc => accounts.push({ id: doc.id, ...doc.data() }));
       renderAccounts();
-      // Atualizar contador
       db.collection('wyd_servers').doc(currentServer.id).update({ accountCount: accounts.length });
     });
 }
 
 function renderAccounts() {
   const list = document.getElementById('accounts-list');
-  const filterClass = document.getElementById('filter-class').value;
+  const fc = document.getElementById('filter-class').value;
   list.innerHTML = '';
+  const filtered = fc ? accounts.filter(a => a.class === fc) : accounts;
 
-  let filtered = accounts;
-  if (filterClass) filtered = accounts.filter(a => a.class === filterClass);
-
-  if (filtered.length === 0) {
-    list.innerHTML = `<div class="empty-msg">NENHUMA CONTA ENCONTRADA<br><br>Clique em + NOVA CONTA</div>`;
+  if (!filtered.length) {
+    list.innerHTML = `<div class="empty-msg">NENHUMA CONTA ENCONTRADA<br><br>Clique em + NOVA CONTA para começar</div>`;
     return;
   }
 
@@ -946,14 +838,13 @@ function renderAccounts() {
         </div>
         <div class="account-actions">
           <div class="icon-btn" onclick="event.stopPropagation();openAccountModal('${acc.id}')" title="Editar">✏️</div>
-          <div class="icon-btn" onclick="event.stopPropagation();selectAccount('${acc.id}')" title="Ver inventário">📸</div>
+          <div class="icon-btn" onclick="event.stopPropagation();selectAccount('${acc.id}')" title="Prints">📸</div>
         </div>
       </div>
     `;
     card.onclick = () => selectAccount(acc.id);
     list.appendChild(card);
   });
-
   updateStats();
 }
 
@@ -964,13 +855,12 @@ function selectAccount(accId) {
   renderInventory();
   document.getElementById('inv-panel').style.display = 'block';
   document.getElementById('inv-title').textContent = `📸 INVENTÁRIO – ${currentAccount.nick.toUpperCase()}`;
-  document.getElementById('inv-panel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  document.getElementById('inv-panel').scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
 
 function openAccountModal(accId = null) {
   editingAccountId = accId;
   const delBtn = document.getElementById('btn-del-acc');
-
   if (accId) {
     const acc = accounts.find(a => a.id === accId);
     if (!acc) return;
@@ -997,23 +887,21 @@ function openAccountModal(accId = null) {
 async function saveAccount() {
   if (!currentServer) return;
   const data = {
-    serverId:  currentServer.id,
-    nick:      document.getElementById('acc-nick').value.trim(),
-    class:     document.getElementById('acc-class').value,
-    level:     document.getElementById('acc-level').value,
-    login:     document.getElementById('acc-login').value.trim(),
-    password:  document.getElementById('acc-password').value,
-    tag:       document.getElementById('acc-tag').value,
-    notes:     document.getElementById('acc-notes').value.trim(),
+    serverId: currentServer.id,
+    nick:     document.getElementById('acc-nick').value.trim(),
+    class:    document.getElementById('acc-class').value,
+    level:    document.getElementById('acc-level').value,
+    login:    document.getElementById('acc-login').value.trim(),
+    password: document.getElementById('acc-password').value,
+    tag:      document.getElementById('acc-tag').value,
+    notes:    document.getElementById('acc-notes').value.trim(),
     updatedAt: new Date().toISOString()
   };
   if (!data.nick) return;
-
   if (editingAccountId) {
     await db.collection('wyd_accounts').doc(editingAccountId).update(data);
   } else {
-    data.images = [];
-    data.createdAt = new Date().toISOString();
+    data.images = []; data.createdAt = new Date().toISOString();
     await db.collection('wyd_accounts').add(data);
   }
   closeModal('modal-account');
@@ -1030,12 +918,10 @@ async function deleteAccount() {
   }
 }
 
-// ── INVENTÁRIO (IMAGENS) ──────────────────────────────────────────────────
 function renderInventory() {
   const grid = document.getElementById('inv-grid');
   grid.innerHTML = '';
   const images = currentAccount?.images || [];
-
   images.forEach((img, idx) => {
     const slot = document.createElement('div');
     slot.className = 'inv-slot';
@@ -1047,14 +933,12 @@ function renderInventory() {
     slot.onclick = () => viewImage(idx);
     grid.appendChild(slot);
   });
-
-  // Slot de adicionar
   const addSlot = document.createElement('div');
-  addSlot.className = 'inv-slot add-slot';
-  addSlot.innerHTML = `<div class="inv-add">+</div><div class="inv-slot-label">PRINT</div>`;
+  addSlot.className = 'inv-slot';
+  addSlot.style.borderStyle = 'dashed';
+  addSlot.innerHTML = `<div class="inv-add">＋</div><div class="inv-slot-label">PRINT</div>`;
   addSlot.onclick = () => openImageModal();
   grid.appendChild(addSlot);
-
   updateStats();
 }
 
@@ -1069,10 +953,7 @@ async function saveImage() {
   const name = document.getElementById('img-name').value.trim() || 'Inventário';
   const url  = document.getElementById('img-url').value.trim();
   if (!url) return;
-
-  const images = currentAccount.images || [];
-  images.push({ name, url, addedAt: new Date().toISOString() });
-
+  const images = [...(currentAccount.images || []), { name, url, addedAt: new Date().toISOString() }];
   await db.collection('wyd_accounts').doc(currentAccount.id).update({ images });
   currentAccount.images = images;
   renderInventory();
@@ -1091,7 +972,6 @@ function viewImage(idx) {
 async function deleteImage() {
   if (viewingImageIdx === null || !currentAccount) return;
   if (!confirm('Excluir este print?')) return;
-
   const images = currentAccount.images.filter((_, i) => i !== viewingImageIdx);
   await db.collection('wyd_accounts').doc(currentAccount.id).update({ images });
   currentAccount.images = images;
@@ -1099,15 +979,13 @@ async function deleteImage() {
   closeModal('modal-view-img');
 }
 
-// ── STATS ────────────────────────────────────────────────────────────────
 function updateStats() {
-  document.getElementById('stat-servers').textContent = servers.length;
+  document.getElementById('stat-servers').textContent  = servers.length;
   document.getElementById('stat-accounts').textContent = accounts.length;
-  const totalImgs = accounts.reduce((acc, a) => acc + (a.images?.length || 0), 0);
-  document.getElementById('stat-images').textContent = totalImgs;
+  document.getElementById('stat-images').textContent   =
+    accounts.reduce((s, a) => s + (a.images?.length || 0), 0);
 }
 
-// ── UTILS ─────────────────────────────────────────────────────────────────
 function openModal(id)  { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 </script>
